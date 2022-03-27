@@ -29,7 +29,7 @@ if (isloggedin()) {
       require_once($CFG->libdir.'/dmllib.php');
 
         echo"<script type=\"text/javascript\" src=\"$CFG->wwwroot/blocks/timestat/lib/ajax_connection.js\"></script>";
-        $sql = 'SELECT max(id) FROM {log} WHERE userid=? and course=?';
+        $sql = 'SELECT max(id) FROM {logstore_standard_log} WHERE userid=? and courseid=?';
         $registerid = $DB->get_field_sql($sql, array($USER->id, $COURSE->id));
         echo "  <script type='text/javascript'>
                 var start_of_url='$CFG->wwwroot/blocks/timestat/update_register.php?id=$registerid&time=';

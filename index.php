@@ -188,24 +188,24 @@ if (!empty($chooselog)) {
             $modaction, $group, $showcourses, $showusers, $logformat);
 
             if ($hostid == $CFG->mnet_localhost_id) {
-                block_timestat_print_log($course, $user, $datefrom, $dateto, 'l.time DESC', $page, $perpage,
+                block_timestat_print_log($course, $user, $datefrom, $dateto, 'l.timecreated DESC', $page, $perpage,
                         "index.php?id=$course->id&amp;chooselog=1&amp;user=$user&amp;datefrom=$datefrom&amp;dateto=$dateto&amp;
                         modid=$modid&amp;modaction=$modaction&amp;group=$group",
                         $modname, $modid, $modaction, $group);
             } else {
-                block_timestat_print_mnet_log($hostid, $id, $user, $datefrom, $dateto, 'l.time DESC', $page, $perpage, "", $modname,
+                block_timestat_print_mnet_log($hostid, $id, $user, $datefrom, $dateto, 'l.timecreated DESC', $page, $perpage, "", $modname,
                 $modid, $modaction, $group);
             }
             break;
         case 'downloadascsv':
-            if (!print_log_csv($course, $user, $date, 'l.time DESC', $modname,
+            if (!print_log_csv($course, $user, $date, 'l.timecreated DESC', $modname,
                     $modid, $modaction, $group)) {
                 echo $OUTPUT->notification("No logs found!");
                 echo $OUTPUT->footer();
             }
             exit;
         case 'downloadasods':
-            if (!print_log_ods($course, $user, $date, 'l.time DESC', $modname,
+            if (!print_log_ods($course, $user, $date, 'l.timecreated DESC', $modname,
                     $modid, $modaction, $group)) {
                 echo $OUTPUT->notification("No logs found!");
                 echo $OUTPUT->footer();

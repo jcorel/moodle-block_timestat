@@ -26,7 +26,7 @@
 
 if (isloggedin()) {
 
-    if ($record = $DB->get_record('log', array('id' => required_param('id', PARAM_INT)))) {
+    if ($record = $DB->get_record('logstore_standard_log', array('id' => required_param('id', PARAM_INT)))) {
         if ($record->userid == $USER->id && $record->course = $COURSE->id) {
             if ($recordbt = $DB->get_record('block_timestat', array('log_id' => $record->id ))) {
                 $recordbt->timespent = $recordbt->timespent + required_param('time', PARAM_INT);

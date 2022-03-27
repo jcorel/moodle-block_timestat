@@ -589,7 +589,7 @@ function block_timestat_report_log_print_selector_form($course, $selecteduser=0,
     echo '</form>';
 }
 
-function block_timestat_print_log($course, $user=0, $datefrom=0, $dateto=0, $order="l.time ASC", $page=0, $perpage=100,
+function block_timestat_print_log($course, $user=0, $datefrom=0, $dateto=0, $order="l.timecreated ASC", $page=0, $perpage=100,
                    $url="", $modname="", $modid=0, $modaction="", $groupid=0) {
 
     global $CFG, $DB, $OUTPUT;
@@ -672,7 +672,7 @@ function block_timestat_print_log($course, $user=0, $datefrom=0, $dateto=0, $ord
     echo $OUTPUT->paging_bar($totalcount, $page, $perpage, "$url&perpage=$perpage");
 }
 
-function block_timestat_build_logs_array($course, $user=0, $datefrom=0, $dateto=0, $order="l.time ASC", $limitfrom='', $limitnum='',
+function block_timestat_build_logs_array($course, $user=0, $datefrom=0, $dateto=0, $order="l.timecreated ASC", $limitfrom='', $limitnum='',
                    $modname="", $modid=0, $modaction="", $groupid=0) {
 
     global $DB, $SESSION, $USER;
@@ -705,7 +705,7 @@ function block_timestat_build_logs_array($course, $user=0, $datefrom=0, $dateto=
     $params = array();
 
     if ($course->id != SITEID || $modid != 0) {
-        $joins[] = "l.course = :courseid";
+        $joins[] = "l.courseid = :courseid";
         $params['courseid'] = $course->id;
     }
 
@@ -749,7 +749,7 @@ function block_timestat_build_logs_array($course, $user=0, $datefrom=0, $dateto=
 
     if ($datefrom) {
         $enddate = $datefrom + 86400;
-        $joins[] = "l.time > :date AND l.time < :enddate";
+        $joins[] = "l.timecreated > :date AND l.timecreated < :enddate";
         $params['date'] = $datefrom;
         $params['enddate'] = $dateto;
     }
@@ -776,7 +776,7 @@ function block_timestat_build_logs_array($course, $user=0, $datefrom=0, $dateto=
  * @param int $totalcount Passed in by reference.
  * @return array
  */
-function block_timestat_get_logs($select, array $params=null, $order='l.time DESC', $limitfrom='', $limitnum='', &$totalcount) {
+function block_timestat_get_logs($select, array $params=null, $order='l.timecreated DESC', $limitfrom='', $limitnum='', &$totalcount) {
 
     global $DB, $CFG;
 
@@ -809,18 +809,18 @@ function block_timestat_get_logs($select, array $params=null, $order='l.time DES
     if ($CFG->dbtype != 'mysqli') {
         $sql = "
         SELECT DISTINCT l.userid, $allnames,
-        (SELECT SUM(f2.timespent) FROM {log} l2 JOIN {block_timestat} f2 ON f2.log_id = l2.id WHERE l2.userid =  l.userid  $select)
+        (SELECT SUM(f2.timespent) FROM {logstore_standard_log} l2 JOIN {block_timestat} f2 ON f2.log_id = l2.id WHERE l2.userid =  l.userid  $select)
         as timespent
-        FROM  {log}  l
+        FROM  {logstore_standard_log}  l
         JOIN {block_timestat} f2 ON f2.log_id = l.id
         LEFT JOIN {user} u ON l.userid = u.id
         WHERE
-        (SELECT SUM(f2.timespent) FROM {log} l2 JOIN {block_timestat} f2 ON f2.log_id = l2.id WHERE l2.userid =  l.userid
+        (SELECT SUM(f2.timespent) FROM {logstore_standard_log} l2 JOIN {block_timestat} f2 ON f2.log_id = l2.id WHERE l2.userid =  l.userid
         ) > 0 ORDER BY timespent DESC
         ";
     } else {
         $sql = "SELECT l.userid, SUM(bt.timespent) as timespent, $allnames
-        FROM {log} l
+        FROM {logstore_standard_log} l
         LEFT JOIN {user} u ON l.userid = u.id RIGHT JOIN {block_timestat} bt ON l.id = bt.log_id
         $select
         GROUP BY l.userid ORDER BY timespent DESC
