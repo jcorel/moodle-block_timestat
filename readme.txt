@@ -40,23 +40,8 @@ activity time is incremented only when Moodle tab in web browser is active (it i
 
 INSTALLATION GUIDE:
 
-1) Install block in standard way (copy it to '/moodle/blocks' folder and
+Install block in standard way (copy it to '/moodle/blocks' folder and
 click 'Notifications' in admin panel)
-
-2) Add following line of code at end of function standard_end_of_body_html() in file /lib/outputrenderers.php:
-
-    require_once($CFG->dirroot.'/blocks/timestat/lib/timestatlib.php');
-
-so it should look like:
-
-    public function standard_end_of_body_html() {
-        global $CFG;
-
-        (...)
-
-        require_once($CFG->dirroot.'/blocks/timestat/lib/timestatlib.php');
-        return $output;
-    }
 
     
 IMPORTANT FOR USERS OF PREVIOUS VERSIONS (less than 2014090400):

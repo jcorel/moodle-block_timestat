@@ -717,7 +717,7 @@ function block_timestat_build_logs_array($course, $user=0, $datefrom=0, $dateto=
     if ('site_errors' === $modid) {
         $joins[] = "( l.action='error' OR l.action='infected' )";
     } else if ($modid) {
-        $joins[] = "l.cmid = :modid";
+        $joins[] = "l.contextinstanceid = :modid";
         $params['modid'] = $modid;
     }
 
@@ -805,6 +805,12 @@ function block_timestat_get_logs($select, array $params=null, $order='l.timecrea
                 $select = "WHERE $select".$andcount;
     }
     $allnames = get_all_user_name_fields(true, 'u');
+    
+    $useridselect = '';
+    
+    if ($userid){
+        $useridselect .= " AND userid = $userid";
+    }
 
     if ($CFG->dbtype != 'mysqli') {
         $sql = "
@@ -816,7 +822,7 @@ function block_timestat_get_logs($select, array $params=null, $order='l.timecrea
         LEFT JOIN {user} u ON l.userid = u.id
         WHERE
         (SELECT SUM(f2.timespent) FROM {logstore_standard_log} l2 JOIN {block_timestat} f2 ON f2.log_id = l2.id WHERE l2.userid =  l.userid
-        ) > 0 ORDER BY timespent DESC
+        ) > 0 $useridselect ORDER BY timespent DESC
         ";
     } else {
         $sql = "SELECT l.userid, SUM(bt.timespent) as timespent, $allnames
