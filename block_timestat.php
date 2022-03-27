@@ -20,6 +20,7 @@
  * @copyright  2014 Barbara Dębska, Łukasz Sanokowski, Łukasz Musiał
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+require_once($CFG->dirroot.'/blocks/timestat/lib/timestatlib.php');
 
 class block_timestat extends block_base {
 
