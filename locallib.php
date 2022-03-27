@@ -742,7 +742,6 @@ function block_timestat_build_logs_array($course, $user=0, $datefrom=0, $dateto=
         }
     } else {
         if ($user) {
-            $joins[] = "l.userid = :userid";
             $params['userid'] = $user;
         }
     }
@@ -809,13 +808,13 @@ function block_timestat_get_logs($select, array $params=null, $order='l.timecrea
     $useridselect = '';
     
     if ($userid){
-        $useridselect .= " AND userid = $userid";
+        $useridselect .= "AND userid = :userid";
     }
 
     if ($CFG->dbtype != 'mysqli') {
         $sql = "
         SELECT DISTINCT l.userid, $allnames,
-        (SELECT SUM(f2.timespent) FROM {logstore_standard_log} l2 JOIN {block_timestat} f2 ON f2.log_id = l2.id WHERE l2.userid =  l.userid  $select)
+        (SELECT SUM(f2.timespent) FROM {logstore_standard_log} l2 JOIN {block_timestat} f2 ON f2.log_id = l2.id WHERE l2.userid =  l.userid $select)
         as timespent
         FROM  {logstore_standard_log}  l
         JOIN {block_timestat} f2 ON f2.log_id = l.id
