@@ -20,7 +20,6 @@
  * @copyright  2014 Barbara Dębska, Łukasz Sanokowski, Łukasz Musiał
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once($CFG->dirroot.'/blocks/timestat/lib/timestatlib.php');
 
 class block_timestat extends block_base {
 
@@ -30,7 +29,7 @@ class block_timestat extends block_base {
     }
 
     function get_content() {
-        global $CFG, $COURSE, $USER;
+        global $CFG, $COURSE, $PAGE, $USER, $DB;
         $context = context_block::instance($this->instance->id);
 
         if (!has_capability('block/timestat:view', $context)) {
@@ -38,24 +37,32 @@ class block_timestat extends block_base {
             return $this->content;
         } else {
             $this->content = new stdClass;
-            $url = $CFG->wwwroot.'/blocks/timestat/index.php?id='.$COURSE->id;
-            $this->content->text = '<center><a href="'.$url.'">'.get_string('link', 'block_timestat').'<img src="'.
-            $CFG->wwwroot.'/blocks/timestat/images/clock.gif" class="icon" alt="brak" /></a></center>';
+            $url = $CFG->wwwroot . '/blocks/timestat/index.php?id=' . $COURSE->id;
+            $this->content->text = '<a href="' . $url . '">' . get_string('link', 'block_timestat') . '<img src="' .
+                    $CFG->wwwroot . '/blocks/timestat/images/clock.gif" class="icon" alt="brak" /></a>';
             $this->content->footer = null;
+            $sql = 'SELECT max(id) FROM {logstore_standard_log} WHERE userid=? and courseid=?';
+            $registerid = $DB->get_field_sql($sql, array($USER->id, $COURSE->id));
+            $timespentrecord = 0;
+
+            $PAGE->requires->js_call_amd(
+                    'block_timestat/event_emiiter',
+                    'init',
+                    [$registerid]
+            );
             return $this->content;
         }
     }
 
-
     function applicable_formats() {
-         return array(
-                 'site-index' => false,
-                 'course-view' => true,
+        return array(
+                'site-index' => false,
+                'course-view' => true,
                 'course-view-social' => true,
-                 'mod' => false,
-                 'mod-quiz' => false,
-         'course' => true
-           );
+                'mod' => true,
+                'mod-quiz' => true,
+                'course' => true
+        );
     }
 
     function instance_allow_multiple() {
