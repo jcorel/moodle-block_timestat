@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+use core_user\fields;
+
 defined('MOODLE_INTERNAL') || die;
 
 if (!defined('REPORT_LOG_MAX_DISPLAY')) {
@@ -23,6 +25,18 @@ if (!defined('REPORT_LOG_MAX_DISPLAY')) {
 /**
  * This function is used to generate and display Mnet selector form
  *
+ * @param int $hostid host id
+ * @param stdClass $course course instance
+ * @param int $selecteduser id of the selected user
+ * @param string $selecteddate Date selected
+ * @param string $modname course_module->id
+ * @param string $modid number or 'site_errors'
+ * @param string $modaction an action as recorded in the logs
+ * @param int $selectedgroup Group to display
+ * @param int $showcourses whether to show courses if we're over our limit.
+ * @param int $showusers whether to show users if we're over our limit.
+ * @param string $logformat Format of the logs (downloadascsv, showashtml, downloadasods, downloadasexcel)
+ * @return void
  * @global stdClass $USER
  * @global stdClass $CFG
  * @global stdClass $SITE
@@ -33,25 +47,14 @@ if (!defined('REPORT_LOG_MAX_DISPLAY')) {
  * @uses COURSE_MAX_COURSES_PER_DROPDOWN
  * @uses CONTEXT_COURSE
  * @uses SEPARATEGROUPS
- * @param  int      $hostid host id
- * @param  stdClass $course course instance
- * @param  int      $selecteduser id of the selected user
- * @param  string   $selecteddate Date selected
- * @param  string   $modname course_module->id
- * @param  string   $modid number or 'site_errors'
- * @param  string   $modaction an action as recorded in the logs
- * @param  int      $selectedgroup Group to display
- * @param  int      $showcourses whether to show courses if we're over our limit.
- * @param  int      $showusers whether to show users if we're over our limit.
- * @param  string   $logformat Format of the logs (downloadascsv, showashtml, downloadasods, downloadasexcel)
- * @return void
  */
-function block_timestat_report_log_print_mnet_selector_form($hostid, $course, $selecteduser=0, $selecteddatefrom='today',
-    $selecteddateto='today', $modname="", $modid=0, $modaction='', $selectedgroup=-1, $showcourses=0, $showusers=0,
-    $logformat='showashtml') {
+function block_timestat_report_log_print_mnet_selector_form($hostid, $course, $selecteduser = 0, $selecteddatefrom = 'today',
+        $selecteddateto = 'today', $modname = "", $modid = 0, $modaction = '', $selectedgroup = -1, $showcourses = 0,
+        $showusers = 0,
+        $logformat = 'showashtml') {
 
     global $USER, $CFG, $SITE, $DB, $OUTPUT, $SESSION;
-    require_once($CFG->dirroot.'/mnet/peer.php');
+    require_once($CFG->dirroot . '/mnet/peer.php');
 
     $mnetpeer = new mnet_peer();
     $mnetpeer->set_id($hostid);
@@ -108,14 +111,15 @@ function block_timestat_report_log_print_mnet_selector_form($hostid, $course, $s
     // Define limitfrom and limitnum for queries below
     // If $showusers is enabled... don't apply limitfrom and limitnum
     $limitfrom = empty($showusers) ? 0 : '';
-    $limitnum  = empty($showusers) ? COURSE_MAX_USERS_PER_DROPDOWN + 1 : '';
+    $limitnum = empty($showusers) ? COURSE_MAX_USERS_PER_DROPDOWN + 1 : '';
+    $allusernamefields = implode(',', fields::get_name_fields(true));
 
     if ($hostid == $CFG->mnet_localhost_id && $course->id != SITEID) {
-        $courseusers = get_enrolled_users($context, '', $selectedgroup, 'u.id, ' . get_all_user_name_fields(true, 'u'),
+        $courseusers = get_enrolled_users($context, '', $selectedgroup, 'u.id, ' . $allusernamefields,
                 null, $limitfrom, $limitnum);
     } else {
         // this may be a lot of users :-(
-        $courseusers = $DB->get_records('user', array('deleted' => 0), 'lastaccess DESC', 'id, ' . get_all_user_name_fields(true),
+        $courseusers = $DB->get_records('user', array('deleted' => 0), 'lastaccess DESC', 'u.id, ' . $allusernamefields,
                 $limitfrom, $limitnum);
     }
 
@@ -163,7 +167,7 @@ function block_timestat_report_log_print_mnet_selector_form($hostid, $course, $s
                 if ($ccc = $DB->get_records("course", null, "fullname", "id,shortname,fullname,category")) {
                     foreach ($ccc as $cc) {
                         if ($cc->id == SITEID) {
-                            $sites["$hostid/$cc->id"]   = format_string($cc->fullname).' ('.get_string('site').')';
+                            $sites["$hostid/$cc->id"] = format_string($cc->fullname) . ' (' . get_string('site') . ')';
                         } else {
                             $courses["$hostid/$cc->id"] = format_string(get_course_display_name_for_list($cc));
                         }
@@ -176,7 +180,7 @@ function block_timestat_report_log_print_mnet_selector_form($hostid, $course, $s
                 if ($ccc = $DB->get_records_sql($sql, array($hostid))) {
                     foreach ($ccc as $cc) {
                         if (1 == $cc->course) { // TODO: this might be wrong - site course may have another id
-                            $sites["$hostid/$cc->course"]   = $cc->coursename.' ('.get_string('site').')';
+                            $sites["$hostid/$cc->course"] = $cc->coursename . ' (' . get_string('site') . ')';
                         } else {
                             $courses["$hostid/$cc->course"] = $cc->coursename;
                         }
@@ -200,15 +204,15 @@ function block_timestat_report_log_print_mnet_selector_form($hostid, $course, $s
                 continue;
             }
             if ($cm->sectionnum > 0 and $section <> $cm->sectionnum) {
-                $activities["section/$cm->sectionnum"] = '--- '.get_section_name($course, $cm->sectionnum).' ---';
+                $activities["section/$cm->sectionnum"] = '--- ' . get_section_name($course, $cm->sectionnum) . ' ---';
             }
             $section = $cm->sectionnum;
             $modname = strip_tags($cm->get_formatted_name());
             if (core_text::strlen($modname) > 55) {
-                $modname = core_text::substr($modname, 0, 50)."...";
+                $modname = core_text::substr($modname, 0, 50) . "...";
             }
             if (!$cm->visible) {
-                $modname = "(".$modname.")";
+                $modname = "(" . $modname . ")";
             }
             $activities["$cm->id"] = $modname;
 
@@ -232,11 +236,11 @@ function block_timestat_report_log_print_mnet_selector_form($hostid, $course, $s
 
     // Prepare the list of action options.
     $actions = array(
-        'view' => get_string('view'),
-        'add' => get_string('add'),
-        'update' => get_string('update'),
-        'delete' => get_string('delete'),
-        '-view' => get_string('allchanges')
+            'view' => get_string('view'),
+            'add' => get_string('add'),
+            'update' => get_string('update'),
+            'delete' => get_string('delete'),
+            '-view' => get_string('allchanges')
     );
 
     // Get all the possible dates
@@ -250,8 +254,8 @@ function block_timestat_report_log_print_mnet_selector_form($hostid, $course, $s
 
     // Put today up the top of the list
     $dates = array(
-        "0" => get_string('alldays'),
-        "$timemidnight" => get_string("today").", ".userdate($timenow, $strftimedate)
+            "0" => get_string('alldays'),
+            "$timemidnight" => get_string("today") . ", " . userdate($timenow, $strftimedate)
     );
 
     if (!$course->startdate or ($course->startdate > $timenow)) {
@@ -280,17 +284,17 @@ function block_timestat_report_log_print_mnet_selector_form($hostid, $course, $s
     if (has_capability('report/log:view', $sitecontext) && $showcourses) {
         $cid = empty($course->id) ? '1' : $course->id;
         echo html_writer::label(get_string('selectacoursesite'), 'menuhost_course', false, array('class' => 'accesshide'));
-        echo html_writer::select($dropdown, "host_course", $hostid.'/'.$cid);
+        echo html_writer::select($dropdown, "host_course", $hostid . '/' . $cid);
     } else {
         $courses = array();
         $courses[$course->id] = get_course_display_name_for_list($course) . ((empty($course->category)) ?
-        ' ('.get_string('site').') ' : '');
+                        ' (' . get_string('site') . ') ' : '');
         echo html_writer::label(get_string('selectacourse'), 'menuid', false, array('class' => 'accesshide'));
         echo html_writer::select($courses, "id", $course->id, false);
         if (has_capability('report/log:view', $sitecontext)) {
             $a = new stdClass();
             $a->url = "$CFG->wwwroot/blocks/timestat/index.php?chooselog=0&group=$selectedgroup&user=$selecteduser"
-                ."&id=$course->id&date=$selecteddate&modid=$selectedactivity&showcourses=1&showusers=$showusers";
+                    . "&id=$course->id&date=$selecteddate&modid=$selectedactivity&showcourses=1&showusers=$showusers";
             print_string('logtoomanycourses', 'moodle', $a);
         }
     }
@@ -322,7 +326,7 @@ function block_timestat_report_log_print_mnet_selector_form($hostid, $course, $s
         echo html_writer::select($users, "user", $selecteduser, false);
         $a = new stdClass();
         $a->url = "$CFG->wwwroot/blocks/timestat/index.php?chooselog=0&group=$selectedgroup&user=$selecteduser"
-            ."&id=$course->id&date=$selecteddate&modid=$selectedactivity&showusers=1&showcourses=$showcourses";
+                . "&id=$course->id&date=$selecteddate&modid=$selectedactivity&showusers=1&showcourses=$showcourses";
         print_string('logtoomanyusers', 'moodle', $a);
     }
 
@@ -331,7 +335,7 @@ function block_timestat_report_log_print_mnet_selector_form($hostid, $course, $s
     echo html_writer::label(get_string('actions'), 'menumodaction', false, array('class' => 'accesshide'));
 
     $logformats = array('showashtml' => get_string('displayonpage'),
-                        'downloadasexcel' => get_string('downloadexcel'));
+            'downloadasexcel' => get_string('downloadexcel'));
     echo html_writer::label(get_string('logsformat', 'report_log'), 'menulogformat', false, array('class' => 'accesshide'));
     echo html_writer::select($logformats, 'logformat', $logformat, false);
     $mform = new block_timestat_calendar();
@@ -342,9 +346,21 @@ function block_timestat_report_log_print_mnet_selector_form($hostid, $course, $s
     echo '</div>';
     echo '</form>';
 }
+
 /**
  * This function is used to generate and display selector form
  *
+ * @param stdClass $course course instance
+ * @param int $selecteduser id of the selected user
+ * @param string $selecteddate Date selected
+ * @param string $modname course_module->id
+ * @param string $modid number or 'site_errors'
+ * @param string $modaction an action as recorded in the logs
+ * @param int $selectedgroup Group to display
+ * @param int $showcourses whether to show courses if we're over our limit.
+ * @param int $showusers whether to show users if we're over our limit.
+ * @param string $logformat Format of the logs (downloadascsv, showashtml, downloadasods, downloadasexcel)
+ * @return void
  * @global stdClass $USER
  * @global stdClass $CFG
  * @global moodle_database $DB
@@ -354,20 +370,10 @@ function block_timestat_report_log_print_mnet_selector_form($hostid, $course, $s
  * @uses COURSE_MAX_COURSES_PER_DROPDOWN
  * @uses CONTEXT_COURSE
  * @uses SEPARATEGROUPS
- * @param  stdClass $course course instance
- * @param  int      $selecteduser id of the selected user
- * @param  string   $selecteddate Date selected
- * @param  string   $modname course_module->id
- * @param  string   $modid number or 'site_errors'
- * @param  string   $modaction an action as recorded in the logs
- * @param  int      $selectedgroup Group to display
- * @param  int      $showcourses whether to show courses if we're over our limit.
- * @param  int      $showusers whether to show users if we're over our limit.
- * @param  string   $logformat Format of the logs (downloadascsv, showashtml, downloadasods, downloadasexcel)
- * @return void
  */
-function block_timestat_report_log_print_selector_form($course, $selecteduser=0, $selecteddate='today',
-    $modname="", $modid=0, $modaction='', $selectedgroup=-1, $showcourses=0, $showusers=0, $logformat='showashtml') {
+function block_timestat_report_log_print_selector_form($course, $selecteduser = 0, $selecteddate = 'today',
+        $modname = "", $modid = 0, $modaction = '', $selectedgroup = -1, $showcourses = 0, $showusers = 0,
+        $logformat = 'showashtml') {
 
     global $USER, $CFG, $DB, $OUTPUT, $SESSION;
 
@@ -411,10 +417,11 @@ function block_timestat_report_log_print_selector_form($course, $selecteduser=0,
     // Define limitfrom and limitnum for queries below
     // If $showusers is enabled... don't apply limitfrom and limitnum
     $limitfrom = empty($showusers) ? 0 : '';
-    $limitnum  = empty($showusers) ? COURSE_MAX_USERS_PER_DROPDOWN + 1 : '';
+    $limitnum = empty($showusers) ? COURSE_MAX_USERS_PER_DROPDOWN + 1 : '';
+    $allusernamefields = implode(',', fields::get_name_fields(true));
 
-    $courseusers = get_enrolled_users($context, '', $selectedgroup, 'u.id, ' . get_all_user_name_fields(true, 'u'),
-        null, $limitfrom, $limitnum);
+    $courseusers = get_enrolled_users($context, '', $selectedgroup, 'u.id, ' . $allusernamefields,
+            null, $limitfrom, $limitnum);
 
     if (count($courseusers) < COURSE_MAX_USERS_PER_DROPDOWN && !$showusers) {
         $showusers = 1;
@@ -453,15 +460,15 @@ function block_timestat_report_log_print_selector_form($course, $selecteduser=0,
                 continue;
             }
             if ($cm->sectionnum > 0 and $section <> $cm->sectionnum) {
-                $activities["section/$cm->sectionnum"] = '--- '.get_section_name($course, $cm->sectionnum).' ---';
+                $activities["section/$cm->sectionnum"] = '--- ' . get_section_name($course, $cm->sectionnum) . ' ---';
             }
             $section = $cm->sectionnum;
             $modname = strip_tags($cm->get_formatted_name());
             if (core_text::strlen($modname) > 55) {
-                $modname = core_text::substr($modname, 0, 50)."...";
+                $modname = core_text::substr($modname, 0, 50) . "...";
             }
             if (!$cm->visible) {
-                $modname = "(".$modname.")";
+                $modname = "(" . $modname . ")";
             }
             $activities["$cm->id"] = $modname;
 
@@ -485,11 +492,11 @@ function block_timestat_report_log_print_selector_form($course, $selecteduser=0,
 
     // Prepare the list of action options.
     $actions = array(
-        'view' => get_string('view'),
-        'add' => get_string('add'),
-        'update' => get_string('update'),
-        'delete' => get_string('delete'),
-        '-view' => get_string('allchanges')
+            'view' => get_string('view'),
+            'add' => get_string('add'),
+            'update' => get_string('update'),
+            'delete' => get_string('delete'),
+            '-view' => get_string('allchanges')
     );
 
     // Get all the possible dates
@@ -502,7 +509,7 @@ function block_timestat_report_log_print_selector_form($course, $selecteduser=0,
     $timemidnight = $today = usergetmidnight($timenow);
 
     // Put today up the top of the list
-    $dates = array("$timemidnight" => get_string("today").", ".userdate($timenow, $strftimedate) );
+    $dates = array("$timemidnight" => get_string("today") . ", " . userdate($timenow, $strftimedate));
 
     if (!$course->startdate or ($course->startdate > $timenow)) {
         $course->startdate = $course->timecreated;
@@ -531,13 +538,13 @@ function block_timestat_report_log_print_selector_form($course, $selecteduser=0,
     } else {
         $courses = array();
         $courses[$course->id] = get_course_display_name_for_list($course) . (($course->id == SITEID) ?
-        ' ('.get_string('site').') ' : '');
+                        ' (' . get_string('site') . ') ' : '');
         echo html_writer::label(get_string('selectacourse'), 'menuid', false, array('class' => 'accesshide'));
         echo html_writer::select($courses, "id", $course->id, false);
         if (has_capability('report/log:view', $sitecontext)) {
             $a = new stdClass();
             $a->url = "$CFG->wwwroot/blocks/timestat/index.php?chooselog=0&group=$selectedgroup&user=$selecteduser"
-                ."&id=$course->id&date=$selecteddate&modid=$selectedactivity&showcourses=1&showusers=$showusers";
+                    . "&id=$course->id&date=$selecteddate&modid=$selectedactivity&showcourses=1&showusers=$showusers";
             print_string('logtoomanycourses', 'moodle', $a);
         }
     }
@@ -569,7 +576,7 @@ function block_timestat_report_log_print_selector_form($course, $selecteduser=0,
         echo html_writer::select($users, "user", $selecteduser, false);
         $a = new stdClass();
         $a->url = "$CFG->wwwroot/blocks/timestat/index.php?chooselog=0&group=$selectedgroup&user=$selecteduser"
-            ."&id=$course->id&date=$selecteddate&modid=$selectedactivity&showusers=1&showcourses=$showcourses";
+                . "&id=$course->id&date=$selecteddate&modid=$selectedactivity&showusers=1&showcourses=$showcourses";
         print_string('logtoomanyusers', 'moodle', $a);
     }
 
@@ -578,7 +585,7 @@ function block_timestat_report_log_print_selector_form($course, $selecteduser=0,
     echo html_writer::label(get_string('actions'), 'menumodaction', false, array('class' => 'accesshide'));
 
     $logformats = array('showashtml' => get_string('displayonpage'),
-                        'downloadasexcel' => get_string('downloadexcel'));
+            'downloadasexcel' => get_string('downloadexcel'));
 
     echo html_writer::label(get_string('logsformat', 'report_log'), 'menulogformat', false, array('class' => 'accesshide'));
     echo html_writer::select($logformats, 'logformat', $logformat, false);
@@ -589,13 +596,14 @@ function block_timestat_report_log_print_selector_form($course, $selecteduser=0,
     echo '</form>';
 }
 
-function block_timestat_print_log($course, $user=0, $datefrom=0, $dateto=0, $order="l.timecreated ASC", $page=0, $perpage=100,
-                   $url="", $modname="", $modid=0, $modaction="", $groupid=0) {
+function block_timestat_print_log($course, $user = 0, $datefrom = 0, $dateto = 0, $order = "l.timecreated ASC", $page = 0,
+        $perpage = 100,
+        $url = "", $modname = "", $modid = 0, $modaction = "", $groupid = 0) {
 
     global $CFG, $DB, $OUTPUT;
 
     if (!$logs = block_timestat_build_logs_array($course, $user, $datefrom, $dateto, $order, $page * $perpage, $perpage,
-                       $modname, $modid, $modaction, $groupid)) {
+            $modname, $modid, $modaction, $groupid)) {
         echo $OUTPUT->notification("No logs found!");
         echo $OUTPUT->footer();
         exit;
@@ -618,7 +626,7 @@ function block_timestat_print_log($course, $user=0, $datefrom=0, $dateto=0, $ord
     $count = 0;
     $ldcache = array();
     $tt = getdate(time());
-    $today = mktime (0, 0, 0, $tt["mon"], $tt["mday"], $tt["year"]);
+    $today = mktime(0, 0, 0, $tt["mon"], $tt["mday"], $tt["year"]);
 
     $strftimedatetime = get_string("strftimedatetime");
 
@@ -632,8 +640,8 @@ function block_timestat_print_log($course, $user=0, $datefrom=0, $dateto=0, $ord
     $table->classes = array('logtable', 'generaltable');
     $table->align = array('right', 'left', 'left');
     $table->head = array(
-        get_string('fullnameuser'),
-        get_string('time')
+            get_string('fullnameuser'),
+            get_string('time')
 
     );
     $table->data = array();
@@ -655,14 +663,14 @@ function block_timestat_print_log($course, $user=0, $datefrom=0, $dateto=0, $ord
             if (empty($log->course)) {
                 $row[] = get_string('site');
             } else {
-                $row[] = "<a href=\"{$CFG->wwwroot}/course/view.php?id={$log->course}\">".
-                format_string($courses[$log->course])."</a>";
+                $row[] = "<a href=\"{$CFG->wwwroot}/course/view.php?id={$log->course}\">" .
+                        format_string($courses[$log->course]) . "</a>";
             }
         }
 
         $row[] = html_writer::link(new moodle_url("/user/view.php?id={$log->userid}"),
-        fullname($log, has_capability('moodle/site:viewfullnames',
-        context_course::instance($course->id))));
+                fullname($log, has_capability('moodle/site:viewfullnames',
+                        context_course::instance($course->id))));
 
         $row[] = block_timestat_seconds_to_stringtime($log->{'timespent'});
         $table->data[] = $row;
@@ -672,8 +680,9 @@ function block_timestat_print_log($course, $user=0, $datefrom=0, $dateto=0, $ord
     echo $OUTPUT->paging_bar($totalcount, $page, $perpage, "$url&perpage=$perpage");
 }
 
-function block_timestat_build_logs_array($course, $user=0, $datefrom=0, $dateto=0, $order="l.timecreated ASC", $limitfrom='', $limitnum='',
-                   $modname="", $modid=0, $modaction="", $groupid=0) {
+function block_timestat_build_logs_array($course, $user = 0, $datefrom = 0, $dateto = 0, $order = "l.timecreated ASC",
+        $limitfrom = '', $limitnum = '',
+        $modname = "", $modid = 0, $modaction = "", $groupid = 0) {
 
     global $DB, $SESSION, $USER;
     // It is assumed that $date is the GMT time of midnight for that day,
@@ -684,7 +693,7 @@ function block_timestat_build_logs_array($course, $user=0, $datefrom=0, $dateto=
     // If the group mode is separate, and this user does not have editing privileges,
     // then only the user's group can be viewed.
     if ($course->groupmode == SEPARATEGROUPS and !has_capability('moodle/course:managegroups',
-        context_course::instance($course->id))) {
+                    context_course::instance($course->id))) {
         if (isset($SESSION->currentgroup[$course->id])) {
             $groupid = $SESSION->currentgroup[$course->id];
         } else {
@@ -725,10 +734,10 @@ function block_timestat_build_logs_array($course, $user=0, $datefrom=0, $dateto=
         $firstletter = substr($modaction, 0, 1);
         if ($firstletter == '-') {
             $joins[] = $DB->sql_like('l.action', ':modaction', false, true, true);
-            $params['modaction'] = '%'.substr($modaction, 1).'%';
+            $params['modaction'] = '%' . substr($modaction, 1) . '%';
         } else {
             $joins[] = $DB->sql_like('l.action', ':modaction', false);
-            $params['modaction'] = '%'.$modaction.'%';
+            $params['modaction'] = '%' . $modaction . '%';
         }
     }
 
@@ -764,9 +773,6 @@ function block_timestat_build_logs_array($course, $user=0, $datefrom=0, $dateto=
 /**
  * Select all log records based on SQL criteria
  *
- * @package core
- * @category log
- * @global moodle_database $DB
  * @param string $select SQL select criteria
  * @param array $params named sql type params
  * @param string $order SQL order by clause to sort the records returned
@@ -774,15 +780,19 @@ function block_timestat_build_logs_array($course, $user=0, $datefrom=0, $dateto=
  * @param int $limitnum return a subset comprising this many records (optional, required if $limitfrom is set)
  * @param int $totalcount Passed in by reference.
  * @return array
+ * @package core
+ * @category log
+ * @global moodle_database $DB
  */
-function block_timestat_get_logs($select, array $params=null, $order='l.timecreated DESC', $limitfrom='', $limitnum='', &$totalcount) {
+function block_timestat_get_logs($select, array $params = null, $order = 'l.timecreated DESC', $limitfrom = '', $limitnum = '',
+        &$totalcount) {
 
     global $DB, $CFG;
 
     $selectsql = "";
-    $countsql  = "";
-    $userid    = "";
-    $andcount  = "";
+    $countsql = "";
+    $userid = "";
+    $andcount = "";
     if (isset($params['userid'])) {
         $userid = $params['userid'];
     } else {
@@ -795,25 +805,25 @@ function block_timestat_get_logs($select, array $params=null, $order='l.timecrea
             if ($userid == 0) {
                 $andcount = ' AND f2.timespent > 0 ';
             }
-            $select = " AND $select".$andcount;
+            $select = " AND $select" . $andcount;
         }
     } else {
         if ($userid == 0) {
             $andcount = ' AND bt.timespent > 0 ';
         }
-                $select = "WHERE $select".$andcount;
+        $select = "WHERE $select" . $andcount;
     }
-    $allnames = get_all_user_name_fields(true, 'u');
-    
+    $allusernamefields = implode(',', fields::get_name_fields(true));
+
     $useridselect = '';
-    
-    if ($userid){
+
+    if ($userid) {
         $useridselect .= "AND userid = :userid";
     }
 
     if ($CFG->dbtype != 'mysqli') {
         $sql = "
-        SELECT DISTINCT l.userid, $allnames,
+        SELECT DISTINCT l.userid, $allusernamefields,
         (SELECT SUM(f2.timespent) FROM {logstore_standard_log} l2 JOIN {block_timestat} f2 ON f2.log_id = l2.id WHERE l2.userid =  l.userid $select)
         as timespent
         FROM  {logstore_standard_log}  l
@@ -824,7 +834,7 @@ function block_timestat_get_logs($select, array $params=null, $order='l.timecrea
         ) > 0 $useridselect ORDER BY timespent DESC
         ";
     } else {
-        $sql = "SELECT l.userid, SUM(bt.timespent) as timespent, $allnames
+        $sql = "SELECT l.userid, SUM(bt.timespent) as timespent, $allusernamefields
         FROM {logstore_standard_log} l
         LEFT JOIN {user} u ON l.userid = u.id RIGHT JOIN {block_timestat} bt ON l.id = bt.log_id
         $select
@@ -839,10 +849,11 @@ function block_timestat_get_logs($select, array $params=null, $order='l.timecrea
 
 // Form to select start and end date ranges and session time
 require_once($CFG->libdir . '/formslib.php');
+
 class block_timestat_calendar extends moodleform {
 
     function definition() {
-        $mform = & $this->_form;
+        $mform = &$this->_form;
         $mform->addElement('date_time_selector', 'datefrom', get_string('start', 'block_timestat'));
         $mform->addElement('date_time_selector', 'dateto', get_string('end', 'block_timestat'));
 
@@ -852,15 +863,15 @@ class block_timestat_calendar extends moodleform {
 
 }
 
-function block_timestat_print_log_xls($course, $user, $datefrom, $dateto, $order='l.time DESC', $modname,
-                        $modid, $modaction, $groupid) {
+function block_timestat_print_log_xls($course, $user, $datefrom, $dateto, $order = 'l.time DESC', $modname,
+        $modid, $modaction, $groupid) {
 
     global $CFG, $DB;
 
     require_once("$CFG->libdir/excellib.class.php");
 
     if (!$logs = block_timestat_build_logs_array($course, $user, $datefrom, $dateto, $order, '', '',
-                       $modname, $modid, $modaction, $groupid)) {
+            $modname, $modid, $modaction, $groupid)) {
         return false;
     }
     $courses = array();
@@ -879,27 +890,27 @@ function block_timestat_print_log_xls($course, $user, $datefrom, $dateto, $order
     $count = 0;
     $ldcache = array();
     $tt = getdate(time());
-    $today = mktime (0, 0, 0, $tt["mon"], $tt["mday"], $tt["year"]);
+    $today = mktime(0, 0, 0, $tt["mon"], $tt["mday"], $tt["year"]);
 
     $strftimedatetime = get_string("strftimedatetime");
 
     $nropages = ceil(count($logs) / (EXCELROWS - FIRSTUSEDEXCELROW + 1));
-    $filename = 'logs_'.userdate(time(), get_string('backupnameformat', 'langconfig'), 99, false);
+    $filename = 'logs_' . userdate(time(), get_string('backupnameformat', 'langconfig'), 99, false);
     $filename .= '.xls';
 
     $workbook = new MoodleExcelWorkbook('-');
     $workbook->send($filename);
 
     $worksheet = array();
-    $headers = array(get_string('fullnameuser'), get_string('time') );
+    $headers = array(get_string('fullnameuser'), get_string('time'));
 
     // Creating worksheets
     for ($wsnumber = 1; $wsnumber <= $nropages; $wsnumber++) {
-        $sheettitle = get_string('logs').' '.$wsnumber.'-'.$nropages;
+        $sheettitle = get_string('logs') . ' ' . $wsnumber . '-' . $nropages;
         $worksheet[$wsnumber] = $workbook->add_worksheet($sheettitle);
         $worksheet[$wsnumber]->set_column(1, 1, 30);
-        $worksheet[$wsnumber]->write_string(0, 0, get_string('savedat').
-                                    userdate(time(), $strftimedatetime));
+        $worksheet[$wsnumber]->write_string(0, 0, get_string('savedat') .
+                userdate(time(), $strftimedatetime));
         $col = 0;
         foreach ($headers as $item) {
             $worksheet[$wsnumber]->write(FIRSTUSEDEXCELROW - 1, $col, $item, '');
@@ -931,7 +942,7 @@ function block_timestat_print_log_xls($course, $user, $datefrom, $dateto, $order
         $coursecontext = context_course::instance($course->id);
 
         $fullname = fullname($log, has_capability('moodle/site:viewfullnames', $coursecontext));
-        $fullname = $log->firstname." ".$log->lastname;
+        $fullname = $log->firstname . " " . $log->lastname;
         $myxls->write($row, 0, $fullname, '');
         $myxls->write($row, 1, block_timestat_seconds_to_stringtime($log->{'timespent'}), '');
         $row++;
@@ -946,23 +957,23 @@ function block_timestat_seconds_to_stringtime($seconds) {
     $conhour = $conmin * 60;
     $conday = $conhour * 24;
 
-    $tempday = (int)((int)$seconds / (int)$conday);
+    $tempday = (int) ((int) $seconds / (int) $conday);
     $seconds = $seconds - $tempday * $conday;
-    $temphour = (int)((int)$seconds / (int)$conhour);
+    $temphour = (int) ((int) $seconds / (int) $conhour);
     $seconds = $seconds - $temphour * $conhour;
-    $tempmin = (int)((int)$seconds / (int)$conmin);
+    $tempmin = (int) ((int) $seconds / (int) $conmin);
     $seconds = $seconds - $tempmin * $conmin;
 
     $str = '';
     if ($tempday != 0) {
-        $str = $str.$tempday.get_string('days', 'block_timestat');
+        $str = $str . $tempday . get_string('days', 'block_timestat');
     }
     if ($temphour != 0) {
-        $str = $str.$temphour.get_string('hours', 'block_timestat');
+        $str = $str . $temphour . get_string('hours', 'block_timestat');
     }
     if ($tempmin != 0) {
-        $str = $str.$tempmin.get_string('minuts', 'block_timestat');
+        $str = $str . $tempmin . get_string('minuts', 'block_timestat');
     }
-    $str = $str.$seconds.get_string('seconds', 'block_timestat');
+    $str = $str . $seconds . get_string('seconds', 'block_timestat');
     return $str;
 }

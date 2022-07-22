@@ -69,17 +69,17 @@ class external extends external_api {
                 ['timespent' => $timespent, 'registerid' => $registerid]
         );
        
-        $recordtimestat =  $DB->get_record('block_timestat', array('log_id' => $registerid));
+        $recordtimestat =  $DB->get_record('block_timestat', array('log_id' => $params['registerid']));
         
         if (!$recordtimestat){
             $recordbt = new \stdClass();
             $recordbt->log_id = $registerid;
-            $recordbt->timespent = $timespent;
+            $recordbt->timespent = $params['timespent'];
             $DB->insert_record('block_timestat', $recordbt);
             return [];
         }
 
-        $recordtimestat->timespent = $timespent;
+        $recordtimestat->timespent = $params['timespent'];
         $DB->update_record('block_timestat', $recordtimestat);
 
         return [];

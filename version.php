@@ -22,7 +22,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2015090802;
+$plugin->version = 2022032901;
 $plugin->component = 'block_timestat';
 $plugin->maturity   = MATURITY_STABLE;
 $plugin->requires = 2013040500;

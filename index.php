@@ -37,7 +37,7 @@ $user        = optional_param('user', 0, PARAM_INT); // User to display
 
 $datefromget = optional_param_array('datefrom', 0, PARAM_INTEGER);
 
-if (is_string($datefromget)) {
+if (is_int($datefromget)) {
     $datefrom = $datefromget;
 } else {
     $datefromyear    = (int)$datefromget['year'];
@@ -49,7 +49,7 @@ if (is_string($datefromget)) {
 }
 
 $datetoget = optional_param_array('dateto', 0, PARAM_INTEGER);
-if (is_string($datetoget)) {
+if (is_int($datetoget)) {
     $dateto = $datetoget;
 } else {
     $datetoyear    = (int)$datetoget['year'];
