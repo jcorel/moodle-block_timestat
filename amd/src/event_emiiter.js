@@ -11,14 +11,14 @@ define(['jquery', 'block_timestat/screentime', 'core/ajax'], function($, screent
             selector: 'body'
           }
         ],
-        percentOnScreen: "1%",
+        percentOnScreen: "10%",
         googleAnalytics: false,
         reportInterval: 15,
         callback: function(data, log) {
           ajax.call([{
             methodname: 'block_timestat_update_register',
             args: {
-              timespent: (log.content),
+              timespent: log.content,
               registerid: registerid
             }
           }]);
