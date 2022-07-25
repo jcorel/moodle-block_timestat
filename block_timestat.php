@@ -29,7 +29,12 @@ class block_timestat extends block_base {
     }
 
     function get_content() {
+        if ($this->content !== NULL) {
+            return $this->content;
+        }
+
         global $CFG, $COURSE, $PAGE, $USER, $DB;
+
         $context = context_block::instance($this->instance->id);
 
         if (!has_capability('block/timestat:view', $context)) {
