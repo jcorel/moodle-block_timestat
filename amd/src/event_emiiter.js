@@ -19,7 +19,7 @@ define(['jquery', 'block_timestat/screentime', 'core/ajax'], function($, screent
             methodname: 'block_timestat_update_register',
             args: {
               timespent: log.content,
-              registerid: registerid
+              registerid: parseInt(registerid)
             }
           }]);
         }

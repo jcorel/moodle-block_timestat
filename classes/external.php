@@ -52,7 +52,7 @@ class external extends external_api {
         return new external_function_parameters(
                 array(
                         'timespent' => new external_value(PARAM_INT),
-                        'registerid' => new external_value(PARAM_RAW),
+                        'registerid' => new external_value(PARAM_INT),
                 )
         );
     }
@@ -64,7 +64,7 @@ class external extends external_api {
      * @throws \invalid_parameter_exception
      * @throws \moodle_exception
      */
-    public static function update_register(string $timespent, string $registerid): array {
+    public static function update_register(int $timespent, int $registerid): array {
         global $DB, $USER;
         
         $params = self::validate_parameters(
