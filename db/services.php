@@ -26,11 +26,12 @@ use block_timestat\external;
 defined('MOODLE_INTERNAL') || die();
 
 $functions = [
-    'block_timestat_update_register' => [
-        'classname'   => external::class,
-        'methodname'  => 'update_register',
-        'description' => '',
-        'type'        => 'write',
-        'ajax'        => true,
-    ],
+        'block_timestat_update_register' => [
+                'classname' => external::class,
+                'methodname' => 'update_register',
+                'description' => '',
+                'type' => 'write',
+                'ajax' => true,
+                'loginrequired' => true,
+        ],
 ];
