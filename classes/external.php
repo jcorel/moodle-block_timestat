@@ -27,6 +27,7 @@ namespace block_timestat;
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/externallib.php');
+require_once($CFG->dirroot . '/blocks/timestat/locallib.php');
 
 use core_course\external\course_summary_exporter;
 use external_api;
@@ -47,7 +48,7 @@ class external extends external_api {
      *
      * @return external_function_parameters
      */
-    public static function update_register_parameters() {
+    public static function update_register_parameters(): external_function_parameters {
         return new external_function_parameters(
                 array(
                         'timespent' => new external_value(PARAM_INT),
@@ -57,18 +58,24 @@ class external extends external_api {
     }
 
     /**
-     * For some given input find and return any course that matches it.
-     *
      * @param string $timespent The user time spent
+     * @param string $registerid The log id
+     * @throws \dml_exception
+     * @throws \invalid_parameter_exception
+     * @throws \moodle_exception
      */
-    public static function update_register(string $timespent, $registerid) {
-        global $DB;
+    public static function update_register(string $timespent, string $registerid): array {
+        global $DB, $USER;
         
         $params = self::validate_parameters(
                 self::update_register_parameters(),
                 ['timespent' => $timespent, 'registerid' => $registerid]
         );
        
+        $log = get_log_by_id($registerid);
+        if ($log->userid !== $USER->id) {
+            throw new \moodle_exception('You are not allowed to update this log');
+        }
         $recordtimestat =  $DB->get_record('block_timestat', array('log_id' => $params['registerid']));
         
         if (!$recordtimestat){
@@ -78,10 +85,8 @@ class external extends external_api {
             $DB->insert_record('block_timestat', $recordbt);
             return [];
         }
-
         $recordtimestat->timespent = $params['timespent'];
         $DB->update_record('block_timestat', $recordtimestat);
-
         return [];
     }
 

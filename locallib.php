@@ -977,3 +977,17 @@ function block_timestat_seconds_to_stringtime($seconds) {
     $str = $str . $seconds . get_string('seconds', 'block_timestat');
     return $str;
 }
+
+/**
+ * @throws dml_exception
+ */
+function get_log_by_id($log_id) {
+    global $DB;
+    return $DB->get_record('logstore_standard_log', array('id' => $log_id));
+}
+
+function get_user_last_log_in_course($user_id , $course_id) {
+    global $DB;
+    $logs = $DB->get_records('logstore_standard_log', array('userid' => $user_id, 'courseid' => $course_id), 'timecreated DESC', '*', 0, 1);
+    return reset($logs);
+}
