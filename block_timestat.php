@@ -21,6 +21,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+require_once($CFG->dirroot . '/blocks/timestat/locallib.php');
+
 class block_timestat extends block_base {
 
     function init() {
@@ -28,35 +30,36 @@ class block_timestat extends block_base {
 
     }
 
+    /**
+     * @throws coding_exception
+     */
     function get_content() {
-        if ($this->content !== NULL) {
+        if ($this->content !== null) {
             return $this->content;
         }
 
-        global $CFG, $COURSE, $PAGE, $USER, $DB;
+        global $CFG, $COURSE, $PAGE, $USER;
 
+        $register = get_user_last_log_in_course($USER->id, $COURSE->id);
+        $PAGE->requires->js_call_amd(
+                'block_timestat/event_emiiter',
+                'init',
+                [$register->id]
+        );
+        
         $context = context_block::instance($this->instance->id);
 
         if (!has_capability('block/timestat:view', $context)) {
             $this->content = null;
             return $this->content;
-        } else {
-            $this->content = new stdClass;
-            $url = $CFG->wwwroot . '/blocks/timestat/index.php?id=' . $COURSE->id;
-            $this->content->text = '<a href="' . $url . '">' . get_string('link', 'block_timestat') . '<img src="' .
-                    $CFG->wwwroot . '/blocks/timestat/images/clock.gif" class="icon" alt="brak" /></a>';
-            $this->content->footer = null;
-            $sql = 'SELECT max(id) FROM {logstore_standard_log} WHERE userid=? and courseid=?';
-            $registerid = $DB->get_field_sql($sql, array($USER->id, $COURSE->id));
-            $timespentrecord = 0;
-
-            $PAGE->requires->js_call_amd(
-                    'block_timestat/event_emiiter',
-                    'init',
-                    [$registerid]
-            );
-            return $this->content;
         }
+
+        $this->content = new stdClass;
+        $url = $CFG->wwwroot . '/blocks/timestat/index.php?id=' . $COURSE->id;
+        $this->content->text = '<a href="' . $url . '">' . get_string('link', 'block_timestat') . '<img src="' .
+                $CFG->wwwroot . '/blocks/timestat/images/clock.gif" class="icon" alt="brak" /></a>';
+        $this->content->footer = null;
+        return $this->content;
     }
 
     function applicable_formats() {
@@ -73,5 +76,4 @@ class block_timestat extends block_base {
     function instance_allow_multiple() {
         return false;
     }
-
 }
