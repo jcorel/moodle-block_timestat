@@ -22,7 +22,6 @@
  */
 
 require_once($CFG->dirroot . '/blocks/timestat/locallib.php');
-
 class block_timestat extends block_base {
 
     function init() {
@@ -32,13 +31,14 @@ class block_timestat extends block_base {
 
     /**
      * @throws coding_exception
+     * @throws moodle_exception
      */
     function get_content() {
         if ($this->content !== null) {
             return $this->content;
         }
 
-        global $CFG, $COURSE, $PAGE, $USER;
+        global $COURSE, $PAGE, $USER;
 
         $register = get_user_last_log_in_course($USER->id, $COURSE->id);
         $PAGE->requires->js_call_amd(
@@ -55,9 +55,8 @@ class block_timestat extends block_base {
         }
 
         $this->content = new stdClass;
-        $url = $CFG->wwwroot . '/blocks/timestat/index.php?id=' . $COURSE->id;
-        $this->content->text = '<a href="' . $url . '">' . get_string('link', 'block_timestat') . '<img src="' .
-                $CFG->wwwroot . '/blocks/timestat/images/clock.gif" class="icon" alt="brak" /></a>';
+        $url = new moodle_url('/blocks/timestat/index.php', ['id' => $COURSE->id]);
+        $this->content->text = html_writer::link($url, get_string('link', 'block_timestat'));
         $this->content->footer = null;
         return $this->content;
     }
