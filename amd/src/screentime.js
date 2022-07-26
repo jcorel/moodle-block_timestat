@@ -1,6 +1,7 @@
 /*!
  * @preserve
  * Screentime.js | v0.2.0
+ * https://github.com/robflaherty/screentime
  * Copyright (c) 2016 Rob Flaherty (@robflaherty)
  * Licensed under the MIT and GPL licenses.
  */
