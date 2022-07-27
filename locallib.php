@@ -19,7 +19,7 @@ use core_user\fields;
 defined('MOODLE_INTERNAL') || die;
 
 if (!defined('REPORT_LOG_MAX_DISPLAY')) {
-    define('REPORT_LOG_MAX_DISPLAY', 150); // Days
+    define('REPORT_LOG_MAX_DISPLAY', 150); // Days.
 }
 
 /**
@@ -63,7 +63,7 @@ function block_timestat_report_log_print_mnet_selector_form($hostid, $course, $s
     $courses = $DB->get_records_sql($sql);
     $remotecoursecount = count($courses);
 
-    // First check to see if we can override showcourses and showusers
+    // First check to see if we can override showcourses and showusers.
     $numcourses = $remotecoursecount + $DB->count_records('course');
     if ($numcourses < COURSE_MAX_COURSES_PER_DROPDOWN && !$showcourses) {
         $showcourses = 1;
@@ -71,8 +71,8 @@ function block_timestat_report_log_print_mnet_selector_form($hostid, $course, $s
 
     $sitecontext = context_system::instance();
 
-    // Context for remote data is always SITE
-    // Groups for remote data are always OFF
+    // Context for remote data is always SITE.
+    // Groups for remote data are always OFF.
     if ($hostid == $CFG->mnet_localhost_id) {
         $context = context_course::instance($course->id);
 
@@ -105,11 +105,11 @@ function block_timestat_report_log_print_mnet_selector_form($hostid, $course, $s
         $context = $sitecontext;
     }
 
-    // Get all the possible users
+    // Get all the possible users.
     $users = array();
 
-    // Define limitfrom and limitnum for queries below
-    // If $showusers is enabled... don't apply limitfrom and limitnum
+    // Define limitfrom and limitnum for queries below.
+    // If $showusers is enabled... don't apply limitfrom and limitnum.
     $limitfrom = empty($showusers) ? 0 : '';
     $limitnum = empty($showusers) ? COURSE_MAX_USERS_PER_DROPDOWN + 1 : '';
     $allusernamefields = implode(',', fields::get_name_fields(true));
@@ -118,7 +118,6 @@ function block_timestat_report_log_print_mnet_selector_form($hostid, $course, $s
         $courseusers = get_enrolled_users($context, '', $selectedgroup, 'u.id, ' . $allusernamefields,
                 null, $limitfrom, $limitnum);
     } else {
-        // This may be a lot of users :-(
         $courseusers = $DB->get_records('user', array('deleted' => 0), 'lastaccess DESC', 'u.id, ' . $allusernamefields,
                 $limitfrom, $limitnum);
     }
@@ -136,7 +135,7 @@ function block_timestat_report_log_print_mnet_selector_form($hostid, $course, $s
         $users[$CFG->siteguest] = get_string('guestuser');
     }
 
-    // Get all the hosts that have log records
+    // Get all the hosts that have log records.
     $sql = "select distinct
                 h.id,
                 h.name
@@ -179,7 +178,7 @@ function block_timestat_report_log_print_mnet_selector_form($hostid, $course, $s
                 $sql = "SELECT DISTINCT course, coursename FROM {mnet_log} where hostid = ?";
                 if ($ccc = $DB->get_records_sql($sql, array($hostid))) {
                     foreach ($ccc as $cc) {
-                        if (1 == $cc->course) { // TODO: this might be wrong - site course may have another id
+                        if (1 == $cc->course) { // TODO: this might be wrong - site course may have another id.
                             $sites["$hostid/$cc->course"] = $cc->coursename . ' (' . get_string('site') . ')';
                         } else {
                             $courses["$hostid/$cc->course"] = $cc->coursename;
@@ -243,16 +242,16 @@ function block_timestat_report_log_print_mnet_selector_form($hostid, $course, $s
             '-view' => get_string('allchanges')
     );
 
-    // Get all the possible dates
-    // Note that we are keeping track of real (GMT) time and user time
-    // User time is only used in displays - all calcs and passing is GMT
+    // Get all the possible dates.
+    // Note that we are keeping track of real (GMT) time and user time.
+    // User time is only used in displays - all calcs and passing is GMT.
 
     $timenow = time(); // GMT
 
     // What day is it now for the user, and when is midnight that day (in GMT).
     $timemidnight = $today = usergetmidnight($timenow);
 
-    // Put today up the top of the list
+    // Put today up the top of the list.
     $dates = array(
             "0" => get_string('alldays'),
             "$timemidnight" => get_string("today") . ", " . userdate($timenow, $strftimedate)
@@ -277,7 +276,7 @@ function block_timestat_report_log_print_mnet_selector_form($hostid, $course, $s
     }
 
     echo "<form class=\"logselectform\" action=\"$CFG->wwwroot/blocks/timestat/index.php\" method=\"get\">\n";
-    echo "<div>\n"; // Invisible fieldset here breaks wrapping
+    echo "<div>\n"; // Invisible fieldset here breaks wrapping.
     echo "<input type=\"hidden\" name=\"chooselog\" value=\"1\" />\n";
     echo "<input type=\"hidden\" name=\"showusers\" value=\"$showusers\" />\n";
     echo "<input type=\"hidden\" name=\"showcourses\" value=\"$showcourses\" />\n";
@@ -377,7 +376,7 @@ function block_timestat_report_log_print_selector_form($course, $selecteduser = 
 
     global $USER, $CFG, $DB, $OUTPUT, $SESSION;
 
-    // First check to see if we can override showcourses and showusers
+    // First check to see if we can override showcourses and showusers.
     $numcourses = $DB->count_records("course");
     if ($numcourses < COURSE_MAX_COURSES_PER_DROPDOWN && !$showcourses) {
         $showcourses = 1;
@@ -411,11 +410,11 @@ function block_timestat_report_log_print_selector_form($course, $selecteduser = 
         }
     }
 
-    // Get all the possible users
+    // Get all the possible users.
     $users = array();
 
-    // Define limitfrom and limitnum for queries below
-    // If $showusers is enabled... don't apply limitfrom and limitnum
+    // Define limitfrom and limitnum for queries below.
+    // If $showusers is enabled... don't apply limitfrom and limitnum.
     $limitfrom = empty($showusers) ? 0 : '';
     $limitnum = empty($showusers) ? COURSE_MAX_USERS_PER_DROPDOWN + 1 : '';
     $allusernamefields = implode(',', fields::get_name_fields(true));
@@ -499,16 +498,16 @@ function block_timestat_report_log_print_selector_form($course, $selecteduser = 
             '-view' => get_string('allchanges')
     );
 
-    // Get all the possible dates
-    // Note that we are keeping track of real (GMT) time and user time
-    // User time is only used in displays - all calcs and passing is GMT
+    // Get all the possible dates.
+    // Note that we are keeping track of real (GMT) time and user time.
+    // User time is only used in displays - all calcs and passing is GMT.
 
     $timenow = time(); // GMT
 
     // What day is it now for the user, and when is midnight that day (in GMT).
     $timemidnight = $today = usergetmidnight($timenow);
 
-    // Put today up the top of the list
+    // Put today up the top of the list.
     $dates = array("$timemidnight" => get_string("today") . ", " . userdate($timenow, $strftimedate));
 
     if (!$course->startdate or ($course->startdate > $timenow)) {
@@ -763,7 +762,7 @@ function block_timestat_build_logs_array($course, $user = 0, $datefrom = 0, $dat
     }
 
     $selector = implode(' AND ', $joins);
-    $totalcount = 0;  // Initialise
+    $totalcount = 0;  // Initialise.
     $result = array();
     $result['logs'] = block_timestat_get_logs($selector, $params, $order, $limitfrom, $limitnum, $totalcount);
     $result['totalcount'] = $totalcount;
@@ -824,13 +823,15 @@ function block_timestat_get_logs($select, array $params = null, $order = 'l.time
     if ($CFG->dbtype != 'mysqli') {
         $sql = "
         SELECT DISTINCT l.userid, $allusernamefields,
-        (SELECT SUM(f2.timespent) FROM {logstore_standard_log} l2 JOIN {block_timestat} f2 ON f2.log_id = l2.id WHERE l2.userid =  l.userid $select)
+        (SELECT SUM(f2.timespent) FROM {logstore_standard_log} l2 
+        JOIN {block_timestat} f2 ON f2.log_id = l2.id WHERE l2.userid =  l.userid $select)
         as timespent
         FROM  {logstore_standard_log}  l
         JOIN {block_timestat} f2 ON f2.log_id = l.id
         LEFT JOIN {user} u ON l.userid = u.id
         WHERE
-        (SELECT SUM(f2.timespent) FROM {logstore_standard_log} l2 JOIN {block_timestat} f2 ON f2.log_id = l2.id WHERE l2.userid =  l.userid
+        (SELECT SUM(f2.timespent) FROM {logstore_standard_log} l2 
+        JOIN {block_timestat} f2 ON f2.log_id = l2.id WHERE l2.userid =  l.userid
         ) > 0 $useridselect ORDER BY timespent DESC
         ";
     } else {
@@ -847,7 +848,7 @@ function block_timestat_get_logs($select, array $params = null, $order = 'l.time
 
 }
 
-// Form to select start and end date ranges and session time
+// Form to select start and end date ranges and session time.
 require_once($CFG->libdir . '/formslib.php');
 
 class block_timestat_calendar extends moodleform {
@@ -904,7 +905,7 @@ function block_timestat_print_log_xls($course, $user, $datefrom, $dateto, $order
     $worksheet = array();
     $headers = array(get_string('fullnameuser'), get_string('time'));
 
-    // Creating worksheets
+    // Creating worksheets.
     for ($wsnumber = 1; $wsnumber <= $nropages; $wsnumber++) {
         $sheettitle = get_string('logs') . ' ' . $wsnumber . '-' . $nropages;
         $worksheet[$wsnumber] = $workbook->add_worksheet($sheettitle);
@@ -981,13 +982,15 @@ function block_timestat_seconds_to_stringtime($seconds) {
 /**
  * @throws dml_exception
  */
-function get_log_by_id($log_id) {
+function get_log_by_id($logid) {
     global $DB;
-    return $DB->get_record('logstore_standard_log', array('id' => $log_id));
+    return $DB->get_record('logstore_standard_log', array('id' => $logid));
 }
 
-function get_user_last_log_in_course($user_id , $course_id) {
+function get_user_last_log_in_course($userid , $courseid) {
     global $DB;
-    $logs = $DB->get_records('logstore_standard_log', array('userid' => $user_id, 'courseid' => $course_id), 'timecreated DESC', '*', 0, 1);
+    $logs = $DB->get_records('logstore_standard_log', 
+            array('userid' => $userid, 'courseid' => $courseid), 
+            'timecreated DESC', '*', 0, 1);
     return reset($logs);
 }
