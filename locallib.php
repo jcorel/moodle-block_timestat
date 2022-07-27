@@ -987,7 +987,7 @@ function get_log_by_id($logid) {
 
 function get_user_last_log_in_course($userid , $courseid) {
     global $DB;
-    $logs = $DB->get_records('logstore_standard_log', 
+    $logs = $DB->get_records('logstore_standard_log',
             array('userid' => $userid, 'courseid' => $courseid), 'timecreated DESC', '*', 0, 1);
     return reset($logs);
 }

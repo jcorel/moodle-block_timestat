@@ -194,7 +194,7 @@ if (!empty($chooselog)) {
                         $modname, $modid, $modaction, $group);
             } else {
                 block_timestat_print_mnet_log(
-                        $hostid, $id, $user, $datefrom, $dateto, 'l.timecreated DESC', 
+                        $hostid, $id, $user, $datefrom, $dateto, 'l.timecreated DESC',
                         $page, $perpage, "", $modname, $modid, $modaction, $group
                 );
             }
