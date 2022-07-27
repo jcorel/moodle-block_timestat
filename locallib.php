@@ -25,6 +25,10 @@ if (!defined('REPORT_LOG_MAX_DISPLAY')) {
 /**
  * This function is used to generate and display Mnet selector form
  *
+ * @package    block_timestat
+ * @copyright  2014 Barbara Dębska, Łukasz Sanokowski, Łukasz Musiał
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * 
  * @param int $hostid host id
  * @param stdClass $course course instance
  * @param int $selecteduser id of the selected user
@@ -37,12 +41,6 @@ if (!defined('REPORT_LOG_MAX_DISPLAY')) {
  * @param int $showusers whether to show users if we're over our limit.
  * @param string $logformat Format of the logs (downloadascsv, showashtml, downloadasods, downloadasexcel)
  * @return void
- * @global stdClass $USER
- * @global stdClass $CFG
- * @global stdClass $SITE
- * @global moodle_database $DB
- * @global core_renderer $OUTPUT
- * @global stdClass $SESSION
  * @uses CONTEXT_SYSTEM
  * @uses COURSE_MAX_COURSES_PER_DROPDOWN
  * @uses CONTEXT_COURSE
@@ -360,11 +358,6 @@ function block_timestat_report_log_print_mnet_selector_form($hostid, $course, $s
  * @param int $showusers whether to show users if we're over our limit.
  * @param string $logformat Format of the logs (downloadascsv, showashtml, downloadasods, downloadasexcel)
  * @return void
- * @global stdClass $USER
- * @global stdClass $CFG
- * @global moodle_database $DB
- * @global core_renderer $OUTPUT
- * @global stdClass $SESSION
  * @uses CONTEXT_SYSTEM
  * @uses COURSE_MAX_COURSES_PER_DROPDOWN
  * @uses CONTEXT_COURSE
@@ -848,9 +841,16 @@ function block_timestat_get_logs($select, array $params = null, $order = 'l.time
 
 }
 
-// Form to select start and end date ranges and session time.
 require_once($CFG->libdir . '/formslib.php');
 
+/**
+ *
+ * Form to select start and end date ranges and session time.
+ *
+ * @package    block_timestat
+ * @copyright  2010 onwards Barbara Dębska, Łukasz Musiał, Łukasz Sanokowski
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class block_timestat_calendar extends moodleform {
 
     public function definition() {
@@ -861,6 +861,21 @@ class block_timestat_calendar extends moodleform {
         $this->add_action_buttons(false, get_string('calculate', 'block_timestat'));
     }
 }
+
+/**
+ * Function to print the log in xls format.
+ *
+ * @param stdClass $course
+ * @param stdClass $user
+ * @param int $datefrom
+ * @param int $dateto
+ * @param string $order
+ * @param string $modname
+ * @param int $modid
+ * @param string $modaction
+ * @param int $groupid
+ * @throws coding_exception
+ */
 
 function block_timestat_print_log_xls($course, $user, $datefrom, $dateto, $order = 'l.time DESC', $modname,
         $modid, $modaction, $groupid) {
@@ -930,23 +945,17 @@ function block_timestat_print_log_xls($course, $user, $datefrom, $dateto, $order
     $myxls = $worksheet[$wsnumber];
     foreach ($logs['logs'] as $log) {
 
-        if ($nropages > 1) {
-            if ($row > EXCELROWS) {
-                $wsnumber++;
-                $myxls = $worksheet[$wsnumber];
-                $row = FIRSTUSEDEXCELROW;
-            }
+        if ($nropages > 1 && $row > EXCELROWS) {
+            $wsnumber++;
+            $myxls = $worksheet[$wsnumber];
+            $row = FIRSTUSEDEXCELROW;
         }
 
-        $coursecontext = context_course::instance($course->id);
-
-        $fullname = fullname($log, has_capability('moodle/site:viewfullnames', $coursecontext));
         $fullname = $log->firstname . " " . $log->lastname;
         $myxls->write($row, 0, $fullname, '');
         $myxls->write($row, 1, block_timestat_seconds_to_stringtime($log->{'timespent'}), '');
         $row++;
     }
-
     $workbook->close();
     return true;
 }
@@ -985,7 +994,7 @@ function get_log_by_id($logid) {
     return $DB->get_record('logstore_standard_log', array('id' => $logid));
 }
 
-function get_user_last_log_in_course($userid , $courseid) {
+function get_user_last_log_in_course($userid, $courseid) {
     global $DB;
     $logs = $DB->get_records('logstore_standard_log',
             array('userid' => $userid, 'courseid' => $courseid), 'timecreated DESC', '*', 0, 1);

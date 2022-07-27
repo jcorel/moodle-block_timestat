@@ -15,6 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 /**
  *
+ * Version details for the timestat block.
+ * 
  * @package    block_timestat
  * @copyright  2010 onwards Barbara Dębska, Łukasz Musiał, Łukasz Sanokowski
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

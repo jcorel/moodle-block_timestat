@@ -14,6 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ *
+ * @package    block_timestat
+ * @copyright  2014 Barbara Dębska, Łukasz Sanokowski, Łukasz Musiał
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 require('../../config.php');
 global $CFG;
 require_once($CFG->dirroot.'/blocks/timestat/locallib.php');
