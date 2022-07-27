@@ -22,9 +22,10 @@
  */
 
 require_once($CFG->dirroot . '/blocks/timestat/locallib.php');
+
 class block_timestat extends block_base {
 
-    function init() {
+    public function init() {
         $this->title = get_string('blocktitle', 'block_timestat');
 
     }
@@ -33,20 +34,19 @@ class block_timestat extends block_base {
      * @throws coding_exception
      * @throws moodle_exception
      */
-    function get_content() {
+    public function get_content() {
         if ($this->content !== null) {
             return $this->content;
         }
 
-        global $COURSE, $PAGE, $USER;
+        global $COURSE, $USER;
 
         $register = get_user_last_log_in_course($USER->id, $COURSE->id);
-        $PAGE->requires->js_call_amd(
+        $this->page->requires->js_call_amd(
                 'block_timestat/event_emiiter',
                 'init',
                 [$register->id]
         );
-        
         $context = context_block::instance($this->instance->id);
 
         if (!has_capability('block/timestat:view', $context)) {
@@ -61,7 +61,7 @@ class block_timestat extends block_base {
         return $this->content;
     }
 
-    function applicable_formats() {
+    public function applicable_formats() {
         return array(
                 'site-index' => false,
                 'course-view' => true,
@@ -72,7 +72,7 @@ class block_timestat extends block_base {
         );
     }
 
-    function instance_allow_multiple() {
+    public function instance_allow_multiple() {
         return false;
     }
 }

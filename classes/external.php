@@ -66,19 +66,17 @@ class external extends external_api {
      */
     public static function update_register(int $timespent, int $registerid): array {
         global $DB, $USER;
-        
         $params = self::validate_parameters(
                 self::update_register_parameters(),
                 ['timespent' => $timespent, 'registerid' => $registerid]
         );
-       
         $log = get_log_by_id($registerid);
         if ($log->userid !== $USER->id) {
             throw new \moodle_exception('You are not allowed to update this log');
         }
-        $recordtimestat =  $DB->get_record('block_timestat', array('log_id' => $params['registerid']));
-        
-        if (!$recordtimestat){
+        $recordtimestat = $DB->get_record('block_timestat', array('log_id' => $params['registerid']));
+
+        if (!$recordtimestat) {
             $recordbt = new \stdClass();
             $recordbt->log_id = $registerid;
             $recordbt->timespent = $params['timespent'];
