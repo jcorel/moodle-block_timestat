@@ -246,7 +246,7 @@ function block_timestat_report_log_print_mnet_selector_form($hostid, $course, $s
     // Note that we are keeping track of real (GMT) time and user time.
     // User time is only used in displays - all calcs and passing is GMT.
 
-    $timenow = time(); // GMT
+    $timenow = time(); // GMT.
 
     // What day is it now for the user, and when is midnight that day (in GMT).
     $timemidnight = $today = usergetmidnight($timenow);
@@ -502,7 +502,7 @@ function block_timestat_report_log_print_selector_form($course, $selecteduser = 
     // Note that we are keeping track of real (GMT) time and user time.
     // User time is only used in displays - all calcs and passing is GMT.
 
-    $timenow = time(); // GMT
+    $timenow = time(); // GMT.
 
     // What day is it now for the user, and when is midnight that day (in GMT).
     $timemidnight = $today = usergetmidnight($timenow);
@@ -823,14 +823,14 @@ function block_timestat_get_logs($select, array $params = null, $order = 'l.time
     if ($CFG->dbtype != 'mysqli') {
         $sql = "
         SELECT DISTINCT l.userid, $allusernamefields,
-        (SELECT SUM(f2.timespent) FROM {logstore_standard_log} l2 
+        (SELECT SUM(f2.timespent) FROM {logstore_standard_log} l2
         JOIN {block_timestat} f2 ON f2.log_id = l2.id WHERE l2.userid =  l.userid $select)
         as timespent
         FROM  {logstore_standard_log}  l
         JOIN {block_timestat} f2 ON f2.log_id = l.id
         LEFT JOIN {user} u ON l.userid = u.id
         WHERE
-        (SELECT SUM(f2.timespent) FROM {logstore_standard_log} l2 
+        (SELECT SUM(f2.timespent) FROM {logstore_standard_log} l2
         JOIN {block_timestat} f2 ON f2.log_id = l2.id WHERE l2.userid =  l.userid
         ) > 0 $useridselect ORDER BY timespent DESC
         ";
@@ -853,15 +853,13 @@ require_once($CFG->libdir . '/formslib.php');
 
 class block_timestat_calendar extends moodleform {
 
-    function definition() {
+    public function definition() {
         $mform = &$this->_form;
         $mform->addElement('date_time_selector', 'datefrom', get_string('start', 'block_timestat'));
         $mform->addElement('date_time_selector', 'dateto', get_string('end', 'block_timestat'));
-
-        // Buttons
+        // Buttons.
         $this->add_action_buttons(false, get_string('calculate', 'block_timestat'));
     }
-
 }
 
 function block_timestat_print_log_xls($course, $user, $datefrom, $dateto, $order = 'l.time DESC', $modname,
@@ -990,7 +988,6 @@ function get_log_by_id($logid) {
 function get_user_last_log_in_course($userid , $courseid) {
     global $DB;
     $logs = $DB->get_records('logstore_standard_log', 
-            array('userid' => $userid, 'courseid' => $courseid), 
-            'timecreated DESC', '*', 0, 1);
+            array('userid' => $userid, 'courseid' => $courseid), 'timecreated DESC', '*', 0, 1);
     return reset($logs);
 }
