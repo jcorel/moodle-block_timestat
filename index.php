@@ -32,8 +32,8 @@ if (empty($hostcourse)) {
     list($hostid, $id) = explode('/', $hostcourse);
 }
 
-$group       = optional_param('group', 0, PARAM_INT); // Group to display
-$user        = optional_param('user', 0, PARAM_INT); // User to display
+$group       = optional_param('group', 0, PARAM_INT);
+$user        = optional_param('user', 0, PARAM_INT);
 
 $datefromget = optional_param_array('datefrom', 0, PARAM_INTEGER);
 
@@ -60,13 +60,13 @@ if (is_int($datetoget)) {
     $dateto = strtotime("$datetoyear-$datetomonth-$datetoday $datetohour:$datetominute:00");
 }
 
-$modname     = optional_param('modname', '', PARAM_PLUGIN); // course_module->id
-$modid       = optional_param('modid', 0, PARAM_FILE); // number or 'site_errors'
-$modaction   = optional_param('modaction', '', PARAM_PATH); // an action as recorded in the logs
-$page        = optional_param('page', '0', PARAM_INT);     // which page to show
-$perpage     = optional_param('perpage', '100', PARAM_INT); // how many per page
-$showcourses = optional_param('showcourses', 0, PARAM_INT); // whether to show courses if we're over our limit.
-$showusers   = optional_param('showusers', 0, PARAM_INT); // whether to show users if we're over our limit.
+$modname     = optional_param('modname', '', PARAM_PLUGIN);
+$modid       = optional_param('modid', 0, PARAM_FILE);
+$modaction   = optional_param('modaction', '', PARAM_PATH);
+$page        = optional_param('page', '0', PARAM_INT);
+$perpage     = optional_param('perpage', '100', PARAM_INT);
+$showcourses = optional_param('showcourses', 0, PARAM_INT);
+$showusers   = optional_param('showusers', 0, PARAM_INT);
 $chooselog   = optional_param('chooselog', 0, PARAM_INT);
 $logformat   = optional_param('logformat', 'showashtml', PARAM_ALPHA);
 
