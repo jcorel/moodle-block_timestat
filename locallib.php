@@ -19,7 +19,7 @@ use core_user\fields;
 defined('MOODLE_INTERNAL') || die;
 
 if (!defined('REPORT_LOG_MAX_DISPLAY')) {
-    define('REPORT_LOG_MAX_DISPLAY', 150); // days
+    define('REPORT_LOG_MAX_DISPLAY', 150); // Days
 }
 
 /**
@@ -63,7 +63,7 @@ function block_timestat_report_log_print_mnet_selector_form($hostid, $course, $s
     $courses = $DB->get_records_sql($sql);
     $remotecoursecount = count($courses);
 
-    // first check to see if we can override showcourses and showusers
+    // First check to see if we can override showcourses and showusers
     $numcourses = $remotecoursecount + $DB->count_records('course');
     if ($numcourses < COURSE_MAX_COURSES_PER_DROPDOWN && !$showcourses) {
         $showcourses = 1;
@@ -118,7 +118,7 @@ function block_timestat_report_log_print_mnet_selector_form($hostid, $course, $s
         $courseusers = get_enrolled_users($context, '', $selectedgroup, 'u.id, ' . $allusernamefields,
                 null, $limitfrom, $limitnum);
     } else {
-        // this may be a lot of users :-(
+        // This may be a lot of users :-(
         $courseusers = $DB->get_records('user', array('deleted' => 0), 'lastaccess DESC', 'u.id, ' . $allusernamefields,
                 $limitfrom, $limitnum);
     }
@@ -277,7 +277,7 @@ function block_timestat_report_log_print_mnet_selector_form($hostid, $course, $s
     }
 
     echo "<form class=\"logselectform\" action=\"$CFG->wwwroot/blocks/timestat/index.php\" method=\"get\">\n";
-    echo "<div>\n"; // invisible fieldset here breaks wrapping
+    echo "<div>\n"; // Invisible fieldset here breaks wrapping
     echo "<input type=\"hidden\" name=\"chooselog\" value=\"1\" />\n";
     echo "<input type=\"hidden\" name=\"showusers\" value=\"$showusers\" />\n";
     echo "<input type=\"hidden\" name=\"showcourses\" value=\"$showcourses\" />\n";
@@ -377,7 +377,7 @@ function block_timestat_report_log_print_selector_form($course, $selecteduser = 
 
     global $USER, $CFG, $DB, $OUTPUT, $SESSION;
 
-    // first check to see if we can override showcourses and showusers
+    // First check to see if we can override showcourses and showusers
     $numcourses = $DB->count_records("course");
     if ($numcourses < COURSE_MAX_COURSES_PER_DROPDOWN && !$showcourses) {
         $showcourses = 1;
@@ -686,12 +686,12 @@ function block_timestat_build_logs_array($course, $user = 0, $datefrom = 0, $dat
 
     global $DB, $SESSION, $USER;
     // It is assumed that $date is the GMT time of midnight for that day,
-    // and so the next 86400 seconds worth of logs are printed.
+    // And so the next 86400 seconds worth of logs are printed.
 
     // Setup for group handling.
 
     // If the group mode is separate, and this user does not have editing privileges,
-    // then only the user's group can be viewed.
+    // Then only the user's group can be viewed.
     if ($course->groupmode == SEPARATEGROUPS and !has_capability('moodle/course:managegroups',
                     context_course::instance($course->id))) {
         if (isset($SESSION->currentgroup[$course->id])) {

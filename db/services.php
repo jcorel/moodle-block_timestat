@@ -13,7 +13,6 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-use block_timestat\external;
 
 /**
  * Tool Block Timestat webservice definitions.
@@ -22,6 +21,7 @@ use block_timestat\external;
  * @copyright  2022 Jorge C.
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+use block_timestat\external;
 
 defined('MOODLE_INTERNAL') || die();
 
