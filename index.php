@@ -22,10 +22,10 @@
  */
 require('../../config.php');
 global $CFG;
-require_once($CFG->dirroot.'/blocks/timestat/locallib.php');
-require_once($CFG->libdir.'/adminlib.php');
+require_once($CFG->dirroot . '/blocks/timestat/locallib.php');
+require_once($CFG->libdir . '/adminlib.php');
 
-$id          = optional_param('id', 0, PARAM_INT);
+$id = optional_param('id', 0, PARAM_INT);
 $hostcourse = optional_param('host_course', '', PARAM_PATH);
 
 if (empty($hostcourse)) {
@@ -38,19 +38,19 @@ if (empty($hostcourse)) {
     list($hostid, $id) = explode('/', $hostcourse);
 }
 
-$group       = optional_param('group', 0, PARAM_INT);
-$user        = optional_param('user', 0, PARAM_INT);
+$group = optional_param('group', 0, PARAM_INT);
+$user = optional_param('user', 0, PARAM_INT);
 
 $datefromget = optional_param_array('datefrom', 0, PARAM_INT);
 
 if (is_int($datefromget)) {
     $datefrom = $datefromget;
 } else {
-    $datefromyear    = (int)$datefromget['year'];
-    $datefrommonth   = (int)$datefromget['month'];
-    $datefromday     = (int)$datefromget['day'];
-    $datefromhour    = (int)$datefromget['hour'];
-    $datefromminute  = (int)$datefromget['minute'];
+    $datefromyear = (int) $datefromget['year'];
+    $datefrommonth = (int) $datefromget['month'];
+    $datefromday = (int) $datefromget['day'];
+    $datefromhour = (int) $datefromget['hour'];
+    $datefromminute = (int) $datefromget['minute'];
     $datefrom = strtotime("$datefromyear-$datefrommonth-$datefromday $datefromhour:$datefromminute:00");
 }
 
@@ -58,23 +58,23 @@ $datetoget = optional_param_array('dateto', 0, PARAM_INT);
 if (is_int($datetoget)) {
     $dateto = $datetoget;
 } else {
-    $datetoyear    = (int)$datetoget['year'];
-    $datetomonth   = (int)$datetoget['month'];
-    $datetoday     = (int)$datetoget['day'];
-    $datetohour    = (int)$datetoget['hour'];
-    $datetominute  = (int)$datetoget['minute'];
+    $datetoyear = (int) $datetoget['year'];
+    $datetomonth = (int) $datetoget['month'];
+    $datetoday = (int) $datetoget['day'];
+    $datetohour = (int) $datetoget['hour'];
+    $datetominute = (int) $datetoget['minute'];
     $dateto = strtotime("$datetoyear-$datetomonth-$datetoday $datetohour:$datetominute:00");
 }
 
-$modname     = optional_param('modname', '', PARAM_PLUGIN);
-$modid       = optional_param('modid', 0, PARAM_FILE);
-$modaction   = optional_param('modaction', '', PARAM_PATH);
-$page        = optional_param('page', '0', PARAM_INT);
-$perpage     = optional_param('perpage', '100', PARAM_INT);
+$modname = optional_param('modname', '', PARAM_PLUGIN);
+$modid = optional_param('modid', 0, PARAM_FILE);
+$modaction = optional_param('modaction', '', PARAM_PATH);
+$page = optional_param('page', '0', PARAM_INT);
+$perpage = optional_param('perpage', '100', PARAM_INT);
 $showcourses = optional_param('showcourses', 0, PARAM_INT);
-$showusers   = optional_param('showusers', 0, PARAM_INT);
-$chooselog   = optional_param('chooselog', 0, PARAM_INT);
-$logformat   = optional_param('logformat', 'showashtml', PARAM_ALPHA);
+$showusers = optional_param('showusers', 0, PARAM_INT);
+$chooselog = optional_param('chooselog', 0, PARAM_INT);
+$logformat = optional_param('logformat', 'showashtml', PARAM_ALPHA);
 
 $params = array();
 if ($id !== 0) {
@@ -131,10 +131,10 @@ if ($hostid == $CFG->mnet_localhost_id) {
     $course = $DB->get_record('course', array('id' => $id), '*', MUST_EXIST);
 
 } else {
-    $coursestub        = $DB->get_record('mnet_log', array('hostid' => $hostid, 'course' => $id), '*', true);
-    $course->id        = $id;
+    $coursestub = $DB->get_record('mnet_log', array('hostid' => $hostid, 'course' => $id), '*', true);
+    $course->id = $id;
     $course->shortname = $coursestub->coursename;
-    $course->fullname  = $coursestub->coursename;
+    $course->fullname = $coursestub->coursename;
 }
 
 require_login($course);
@@ -144,7 +144,7 @@ $context = context_course::instance($course->id);
 require_capability('block/timestat:view', $context);
 
 if (!empty($page)) {
-    $strlogs = get_string('logs'). ": ". get_string('page', 'report_log', $page + 1);
+    $strlogs = get_string('logs') . ": " . get_string('page', 'report_log', $page + 1);
 } else {
     $strlogs = get_string('logs');
 }
@@ -174,24 +174,31 @@ if (!empty($chooselog)) {
     }
 
     switch ($logformat) {
-        case 'showashtml':
+        case 'downloadasexcel':
+            if (!block_timestat_print_log_xls($course, $user, $datefrom, $dateto, 'l.time DESC', $modname,
+                    $modid, $modaction, $group)) {
+                echo $OUTPUT->notification("No logs found!");
+                echo $OUTPUT->footer();
+            }
+            exit;
+        default:
             if ($hostid != $CFG->mnet_localhost_id || $course->id == SITEID) {
                 admin_externalpage_setup('reportlog');
-                $PAGE->set_title($course->shortname .': '. $strlogs);
+                $PAGE->set_title($course->shortname . ': ' . $strlogs);
                 $PAGE->set_heading($course->fullname);
                 $PAGE->navbar->add("Timestat");
                 echo $OUTPUT->header();
 
             } else {
-                $PAGE->set_title($course->shortname .': '. $strlogs);
+                $PAGE->set_title($course->shortname . ': ' . $strlogs);
                 $PAGE->set_heading($course->fullname);
                 $PAGE->navbar->add("Timestat");
                 echo $OUTPUT->header();
             }
 
-            echo $OUTPUT->heading(format_string($course->fullname) . ": $userinfo, $datefrominfo (".usertimezone().")");
+            echo $OUTPUT->heading(format_string($course->fullname) . ": $userinfo, $datefrominfo (" . usertimezone() . ")");
             block_timestat_report_log_print_mnet_selector_form($hostid, $course, $user, $datefrom, $dateto, $modname, $modid,
-            $modaction, $group, $showcourses, $showusers, $logformat);
+                    $modaction, $group, $showcourses, $showusers, $logformat);
 
             if ($hostid == $CFG->mnet_localhost_id) {
                 block_timestat_print_log($course, $user, $datefrom, $dateto, 'l.timecreated DESC', $page, $perpage,
@@ -205,44 +212,22 @@ if (!empty($chooselog)) {
                 );
             }
             break;
-        case 'downloadascsv':
-            if (!print_log_csv($course, $user, $date, 'l.timecreated DESC', $modname,
-                    $modid, $modaction, $group)) {
-                echo $OUTPUT->notification("No logs found!");
-                echo $OUTPUT->footer();
-            }
-            exit;
-        case 'downloadasods':
-            if (!print_log_ods($course, $user, $date, 'l.timecreated DESC', $modname,
-                    $modid, $modaction, $group)) {
-                echo $OUTPUT->notification("No logs found!");
-                echo $OUTPUT->footer();
-            }
-            exit;
-        case 'downloadasexcel':
-            if (!block_timestat_print_log_xls($course, $user, $datefrom, $dateto, 'l.time DESC', $modname,
-                    $modid, $modaction, $group)) {
-                echo $OUTPUT->notification("No logs found!");
-                echo $OUTPUT->footer();
-            }
-            exit;
     }
-
 
 } else {
     if ($hostid != $CFG->mnet_localhost_id || $course->id == SITEID) {
         admin_externalpage_setup('reportlog', '', null, '', array('pagelayout' => 'report'));
         echo $OUTPUT->header();
     } else {
-        $PAGE->set_title($course->shortname .': '. $strlogs);
+        $PAGE->set_title($course->shortname . ': ' . $strlogs);
         $PAGE->set_heading($course->fullname);
         echo $OUTPUT->header();
     }
 
-    echo $OUTPUT->heading(get_string('chooselogs') .':');
+    echo $OUTPUT->heading(get_string('chooselogs') . ':');
 
     block_timestat_report_log_print_selector_form($course, $user, $datefrom, $dateto, $modname, $modid, $modaction,
-    $group, $showcourses, $showusers, $logformat);
+            $group, $showcourses, $showusers, $logformat);
 }
 
 echo $OUTPUT->footer();
