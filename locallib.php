@@ -116,7 +116,7 @@ function block_timestat_report_log_print_mnet_selector_form($hostid, $course, $s
         $courseusers = get_enrolled_users($context, '', $selectedgroup, 'u.id, ' . $allusernamefields,
                 null, $limitfrom, $limitnum);
     } else {
-        $courseusers = $DB->get_records('user', array('deleted' => 0), 'lastaccess DESC', 'u.id, ' . $allusernamefields,
+        $courseusers = $DB->get_records('user', array('deleted' => 0), 'lastaccess DESC', 'id, ' . $allusernamefields,
                 $limitfrom, $limitnum);
     }
 

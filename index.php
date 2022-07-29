@@ -41,7 +41,7 @@ if (empty($hostcourse)) {
 $group       = optional_param('group', 0, PARAM_INT);
 $user        = optional_param('user', 0, PARAM_INT);
 
-$datefromget = optional_param_array('datefrom', 0, PARAM_INTEGER);
+$datefromget = optional_param_array('datefrom', 0, PARAM_INT);
 
 if (is_int($datefromget)) {
     $datefrom = $datefromget;
@@ -54,7 +54,7 @@ if (is_int($datefromget)) {
     $datefrom = strtotime("$datefromyear-$datefrommonth-$datefromday $datefromhour:$datefromminute:00");
 }
 
-$datetoget = optional_param_array('dateto', 0, PARAM_INTEGER);
+$datetoget = optional_param_array('dateto', 0, PARAM_INT);
 if (is_int($datetoget)) {
     $dateto = $datetoget;
 } else {
