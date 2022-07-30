@@ -3,7 +3,7 @@
 
 define(['jquery', 'block_timestat/screentime', 'core/ajax'], function($, screentime, ajax) {
   return {
-    init: function(registerid) {
+    init: function(contextid) {
       $.screentime({
         fields: [
           {
@@ -19,7 +19,7 @@ define(['jquery', 'block_timestat/screentime', 'core/ajax'], function($, screent
             methodname: 'block_timestat_update_register',
             args: {
               timespent: log.content,
-              registerid: parseInt(registerid)
+              contextid: parseInt(contextid)
             }
           }]);
         }

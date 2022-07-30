@@ -1059,3 +1059,10 @@ function get_user_last_log_in_course(int $userid, int $courseid): stdClass {
             array('userid' => $userid, 'courseid' => $courseid), 'timecreated DESC', '*', 0, 1);
     return reset($logs);
 }
+
+function get_user_last_log_by_contextid(int $contextid): stdClass {
+    global $DB, $USER;
+    $logs = $DB->get_records('logstore_standard_log',
+            array('contextid' => $contextid, 'userid' => $USER->id), 'timecreated DESC', '*', 0, 1);
+    return reset($logs);
+}

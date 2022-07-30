@@ -55,7 +55,7 @@ class external extends external_api {
         return new external_function_parameters(
                 array(
                         'timespent' => new external_value(PARAM_INT),
-                        'registerid' => new external_value(PARAM_INT),
+                        'contextid' => new external_value(PARAM_INT),
                 )
         );
     }
@@ -65,27 +65,27 @@ class external extends external_api {
      * Update the register to save the timespent in a specific log.
      *
      * @param int $timespent The user time spent
-     * @param int $registerid The log id
+     * @param int $contextid The log id
      * @return array
      * @throws dml_exception
      * @throws invalid_parameter_exception
      * @throws moodle_exception
      */
-    public static function update_register(int $timespent, int $registerid): array {
+    public static function update_register(int $timespent, int $contextid): array {
         global $DB, $USER;
         $params = self::validate_parameters(
                 self::update_register_parameters(),
-                ['timespent' => $timespent, 'registerid' => $registerid]
+                ['timespent' => $timespent, 'contextid' => $contextid]
         );
-        $log = get_log_by_id($registerid);
+        $log = get_user_last_log_by_contextid($contextid);
         if ($log->userid !== $USER->id) {
             throw new moodle_exception('You are not allowed to update this log');
         }
-        $recordtimestat = $DB->get_record('block_timestat', array('log_id' => $params['registerid']));
+        $recordtimestat = $DB->get_record('block_timestat', array('log_id' => $log->id));
 
         if (!$recordtimestat) {
             $recordbt = new \stdClass();
-            $recordbt->log_id = $registerid;
+            $recordbt->log_id = $log->id;
             $recordbt->timespent = $params['timespent'];
             $DB->insert_record('block_timestat', $recordbt);
             return [];

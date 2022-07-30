@@ -48,19 +48,19 @@ class block_timestat extends block_base {
      * Returns the contents.
      *
      * @return stdClass contents of block
+     * @throws dml_exception
      */
     public function get_content() {
         if ($this->content !== null) {
             return $this->content;
         }
 
-        global $COURSE, $USER;
-
-        $register = get_user_last_log_in_course($USER->id, $COURSE->id);
+        global $COURSE, $PAGE;
+        $contextid = $PAGE->cm ? $PAGE->cm->context->id : $PAGE->context->id;
         $this->page->requires->js_call_amd(
                 'block_timestat/event_emiiter',
                 'init',
-                [$register->id]
+                [$contextid]
         );
         $context = context_block::instance($this->instance->id);
 
