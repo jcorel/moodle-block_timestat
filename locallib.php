@@ -35,23 +35,22 @@ if (!defined('REPORT_LOG_MAX_DISPLAY')) {
 /**
  * This function is used to generate and display Mnet selector form
  *
- * @package    block_timestat
- * @copyright  2014 Barbara Dębska, Łukasz Sanokowski, Łukasz Musiał
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * 
  * @param int $hostid host id
  * @param stdClass $course course instance
  * @param int $selecteduser id of the selected user
  * @param string $selecteddatefrom Date from selected
  * @param string $selecteddateto Date to selected
  * @param string $modname course_module->id
- * @param string $modid number or 'site_errors'
+ * @param int $modid number or 'site_errors'
  * @param string $modaction an action as recorded in the logs
  * @param int $selectedgroup Group to display
  * @param int $showcourses whether to show courses if we're over our limit.
  * @param int $showusers whether to show users if we're over our limit.
  * @param string $logformat Format of the logs (downloadascsv, showashtml, downloadasods, downloadasexcel)
  * @return void
+ * @throws coding_exception
+ * @throws dml_exception
+ * @throws moodle_exception
  * @uses CONTEXT_SYSTEM
  * @uses COURSE_MAX_COURSES_PER_DROPDOWN
  * @uses CONTEXT_COURSE
@@ -210,7 +209,7 @@ function block_timestat_report_log_print_mnet_selector_form($hostid, $course, $s
             if (!$cm->uservisible || !$cm->has_view()) {
                 continue;
             }
-            if ($cm->sectionnum > 0 and $section <> $cm->sectionnum) {
+            if ($cm->sectionnum > 0 && $section <> $cm->sectionnum) {
                 $activities["section/$cm->sectionnum"] = '--- ' . get_section_name($course, $cm->sectionnum) . ' ---';
             }
             $section = $cm->sectionnum;
@@ -265,12 +264,12 @@ function block_timestat_report_log_print_mnet_selector_form($hostid, $course, $s
             "$timemidnight" => get_string("today") . ", " . userdate($timenow, $strftimedate)
     );
 
-    if (!$course->startdate or ($course->startdate > $timenow)) {
+    if (!$course->startdate || ($course->startdate > $timenow)) {
         $course->startdate = $course->timecreated;
     }
 
     $numdates = 1;
-    while ($timemidnight > $course->startdate and $numdates < 365) {
+    while ($timemidnight > $course->startdate && $numdates < 365) {
         $timemidnight = $timemidnight - 86400;
         $timenow = $timenow - 86400;
         $dates["$timemidnight"] = userdate($timenow, $strftimedaydate);
@@ -389,7 +388,7 @@ function block_timestat_report_log_print_selector_form($course, $selecteduser = 
     $context = context_course::instance($course->id);
 
     // Setup for group handling.
-    if ($course->groupmode == SEPARATEGROUPS and !has_capability('moodle/site:accessallgroups', $context)) {
+    if ($course->groupmode == SEPARATEGROUPS && !has_capability('moodle/site:accessallgroups', $context)) {
         $selectedgroup = -1;
         $showgroups = false;
     } else if ($course->groupmode) {
@@ -461,7 +460,7 @@ function block_timestat_report_log_print_selector_form($course, $selecteduser = 
             if (!$cm->uservisible || !$cm->has_view()) {
                 continue;
             }
-            if ($cm->sectionnum > 0 and $section <> $cm->sectionnum) {
+            if ($cm->sectionnum > 0 && $section <> $cm->sectionnum) {
                 $activities["section/$cm->sectionnum"] = '--- ' . get_section_name($course, $cm->sectionnum) . ' ---';
             }
             $section = $cm->sectionnum;
@@ -513,12 +512,12 @@ function block_timestat_report_log_print_selector_form($course, $selecteduser = 
     // Put today up the top of the list.
     $dates = array("$timemidnight" => get_string("today") . ", " . userdate($timenow, $strftimedate));
 
-    if (!$course->startdate or ($course->startdate > $timenow)) {
+    if (!$course->startdate || ($course->startdate > $timenow)) {
         $course->startdate = $course->timecreated;
     }
 
     $numdates = 1;
-    while ($timemidnight > $course->startdate and $numdates < 365) {
+    while ($timemidnight > $course->startdate && $numdates < 365) {
         $timemidnight = $timemidnight - 86400;
         $timenow = $timenow - 86400;
         $dates["$timemidnight"] = userdate($timenow, $strftimedaydate);
@@ -727,7 +726,7 @@ function block_timestat_build_logs_array($course, $user = 0, $datefrom = 0, $dat
 
     // If the group mode is separate, and this user does not have editing privileges,
     // Then only the user's group can be viewed.
-    if ($course->groupmode == SEPARATEGROUPS and !has_capability('moodle/course:managegroups',
+    if ($course->groupmode == SEPARATEGROUPS && !has_capability('moodle/course:managegroups',
                     context_course::instance($course->id))) {
         if (isset($SESSION->currentgroup[$course->id])) {
             $groupid = $SESSION->currentgroup[$course->id];
@@ -777,7 +776,7 @@ function block_timestat_build_logs_array($course, $user = 0, $datefrom = 0, $dat
     }
 
     // Getting all members of a group.
-    if ($groupid and !$user) {
+    if ($groupid && !$user) {
         if ($gusers = groups_get_members($groupid)) {
             $gusers = array_keys($gusers);
             $joins[] = 'l.userid IN (' . implode(',', $gusers) . ')';
@@ -919,7 +918,8 @@ class block_timestat_calendar extends moodleform {
  * @param int $groupid
  * @throws coding_exception
  */
-function block_timestat_print_log_xls($course, $user, $datefrom, $dateto, $order = 'l.time DESC', $modname, $modid, $modaction, $groupid) {
+function block_timestat_print_log_xls($course, $user, $datefrom, $dateto, $order = 'l.time DESC', 
+                                      $modname, $modid, $modaction, $groupid) {
 
     global $CFG, $DB;
 

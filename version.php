@@ -16,7 +16,7 @@
 /**
  *
  * Version details for the timestat block.
- * 
+ *
  * @package    block_timestat
  * @copyright  2010 onwards Barbara Dębska, Łukasz Musiał, Łukasz Sanokowski
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
