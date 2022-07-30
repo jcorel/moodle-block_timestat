@@ -588,9 +588,25 @@ function block_timestat_report_log_print_selector_form($course, $selecteduser = 
     echo '</form>';
 }
 
+/**
+ * This function is used to generate and display selector form
+ *
+ * @param stdClass $course course instance
+ * @param int $user user instance
+ * @param int $datefrom
+ * @param int $dateto
+ * @param string $order
+ * @param int $page
+ * @param int $perpage
+ * @param string $url
+ * @param string $modname
+ * @param int $modid
+ * @param string $modaction
+ * @param int $groupid
+ * @throws coding_exception
+ */
 function block_timestat_print_log($course, $user = 0, $datefrom = 0, $dateto = 0, $order = "l.timecreated ASC", $page = 0,
-        $perpage = 100,
-        $url = "", $modname = "", $modid = 0, $modaction = "", $groupid = 0) {
+        $perpage = 100, $url = "", $modname = "", $modid = 0, $modaction = "", $groupid = 0) {
 
     global $CFG, $DB, $OUTPUT;
 
@@ -672,6 +688,23 @@ function block_timestat_print_log($course, $user = 0, $datefrom = 0, $dateto = 0
     echo $OUTPUT->paging_bar($totalcount, $page, $perpage, "$url&perpage=$perpage");
 }
 
+/**
+ * This function is used to build array of logs
+ *
+ * @param stdClass $course course instance
+ * @param int $user userid
+ * @param int $datefrom
+ * @param int $dateto
+ * @param string $order
+ * @param int $page
+ * @param int $perpage
+ * @param string $url
+ * @param string $modname
+ * @param int $modid
+ * @param string $modaction
+ * @param int $groupid
+ * @throws coding_exception
+ */
 function block_timestat_build_logs_array($course, $user = 0, $datefrom = 0, $dateto = 0, $order = "l.timecreated ASC",
         $limitfrom = '', $limitnum = '',
         $modname = "", $modid = 0, $modaction = "", $groupid = 0) {
@@ -866,7 +899,7 @@ class block_timestat_calendar extends moodleform {
  * Function to print the log in xls format.
  *
  * @param stdClass $course
- * @param stdClass $user
+ * @param int $user
  * @param int $datefrom
  * @param int $dateto
  * @param string $order
@@ -877,8 +910,7 @@ class block_timestat_calendar extends moodleform {
  * @throws coding_exception
  */
 
-function block_timestat_print_log_xls($course, $user, $datefrom, $dateto, $order = 'l.time DESC', $modname,
-        $modid, $modaction, $groupid) {
+function block_timestat_print_log_xls($course, $user, $datefrom, $dateto, $order = 'l.time DESC', $modname, $modid, $modaction, $groupid) {
 
     global $CFG, $DB;
 
@@ -960,6 +992,13 @@ function block_timestat_print_log_xls($course, $user, $datefrom, $dateto, $order
     return true;
 }
 
+/**
+ * Function to convert a number of seconds to a string with hours, minutes and seconds.
+ *
+ * @param int $seconds
+ * @return string
+ * @throws dml_exception
+ */
 function block_timestat_seconds_to_stringtime($seconds) {
     $conmin = 60;
     $conhour = $conmin * 60;
@@ -987,14 +1026,25 @@ function block_timestat_seconds_to_stringtime($seconds) {
 }
 
 /**
+ * Function to get a log by id
+ *
+ * @param int $logid
+ * @return stdClass
  * @throws dml_exception
  */
-function get_log_by_id($logid) {
+function get_log_by_id(int $logid): stdClass {
     global $DB;
     return $DB->get_record('logstore_standard_log', array('id' => $logid));
 }
 
-function get_user_last_log_in_course($userid, $courseid) {
+/**
+ * Function to get the user last log in a specific course
+ *
+ * @param int $userid
+ * @param int $courseid
+ * @throws dml_exception
+ */
+function get_user_last_log_in_course(int $userid, int $courseid): stdClass {
     global $DB;
     $logs = $DB->get_records('logstore_standard_log',
             array('userid' => $userid, 'courseid' => $courseid), 'timecreated DESC', '*', 0, 1);

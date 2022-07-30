@@ -16,6 +16,8 @@
 
 /**
  *
+ * Displays different views of the logs.
+ * 
  * @package    block_timestat
  * @copyright  2014 Barbara Dębska, Łukasz Sanokowski, Łukasz Musiał
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
