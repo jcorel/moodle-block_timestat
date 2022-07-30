@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- *
+ * Contains the class for the timestat block.
  * @package    block_timestat
  * @copyright  2014 Barbara Dębska, Łukasz Sanokowski, Łukasz Musiał
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -24,11 +24,23 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/blocks/timestat/locallib.php');
 
+/**
+ * Timestat block class.
+ *
+ * @package    block_timestat
+ * @copyright  2014 Barbara Dębska, Łukasz Sanokowski, Łukasz Musiał
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class block_timestat extends block_base {
 
+    /**
+     * Initialises the block.
+     *
+     * @return void
+     * @throws coding_exception
+     */
     public function init() {
         $this->title = get_string('blocktitle', 'block_timestat');
-
     }
 
     /**
@@ -62,6 +74,11 @@ class block_timestat extends block_base {
         return $this->content;
     }
 
+    /**
+     * Defines where the block can be added.
+     *
+     * @return array
+     */
     public function applicable_formats() {
         return array(
                 'site-index' => false,
@@ -73,6 +90,11 @@ class block_timestat extends block_base {
         );
     }
 
+    /**
+     * Are you going to allow multiple instances of each block?
+     * If yes, then it is assumed that the block WILL USE per-instance configuration
+     * @return boolean
+     */
     public function instance_allow_multiple() {
         return false;
     }
