@@ -14,6 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * This file contains functions used by the block timestat
+ *
+ * This files lists the functions that are used during the log report generation.
+ *
+ * @package    block_timestat
+ * @copyright  2014 Barbara Dębska, Łukasz Sanokowski, Łukasz Musiał
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 use core_user\fields;
 
 defined('MOODLE_INTERNAL') || die;
@@ -32,7 +42,8 @@ if (!defined('REPORT_LOG_MAX_DISPLAY')) {
  * @param int $hostid host id
  * @param stdClass $course course instance
  * @param int $selecteduser id of the selected user
- * @param string $selecteddate Date selected
+ * @param string $selecteddatefrom Date from selected
+ * @param string $selecteddateto Date to selected
  * @param string $modname course_module->id
  * @param string $modid number or 'site_errors'
  * @param string $modaction an action as recorded in the logs
@@ -48,8 +59,7 @@ if (!defined('REPORT_LOG_MAX_DISPLAY')) {
  */
 function block_timestat_report_log_print_mnet_selector_form($hostid, $course, $selecteduser = 0, $selecteddatefrom = 'today',
         $selecteddateto = 'today', $modname = "", $modid = 0, $modaction = '', $selectedgroup = -1, $showcourses = 0,
-        $showusers = 0,
-        $logformat = 'showashtml') {
+        $showusers = 0, $logformat = 'showashtml'): void {
 
     global $USER, $CFG, $SITE, $DB, $OUTPUT, $SESSION;
     require_once($CFG->dirroot . '/mnet/peer.php');
@@ -807,7 +817,6 @@ function block_timestat_build_logs_array($course, $user = 0, $datefrom = 0, $dat
  * @return array
  * @package core
  * @category log
- * @global moodle_database $DB
  */
 function block_timestat_get_logs($select, array $params = null, $order = 'l.timecreated DESC', $limitfrom = '', $limitnum = '',
         &$totalcount) {
@@ -886,6 +895,9 @@ require_once($CFG->libdir . '/formslib.php');
  */
 class block_timestat_calendar extends moodleform {
 
+    /**
+     * Define the form - called by parent constructor
+     */
     public function definition() {
         $mform = &$this->_form;
         $mform->addElement('date_time_selector', 'datefrom', get_string('start', 'block_timestat'));
@@ -909,7 +921,6 @@ class block_timestat_calendar extends moodleform {
  * @param int $groupid
  * @throws coding_exception
  */
-
 function block_timestat_print_log_xls($course, $user, $datefrom, $dateto, $order = 'l.time DESC', $modname, $modid, $modaction, $groupid) {
 
     global $CFG, $DB;
