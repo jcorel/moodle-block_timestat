@@ -1060,6 +1060,12 @@ function get_user_last_log_in_course(int $userid, int $courseid): stdClass {
     return reset($logs);
 }
 
+/**
+ * Function to get the user last log by contextid
+ *
+ * @param int $contextid
+ * @throws dml_exception
+ */
 function get_user_last_log_by_contextid(int $contextid): stdClass {
     global $DB, $USER;
     $logs = $DB->get_records('logstore_standard_log',

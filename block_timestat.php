@@ -55,8 +55,8 @@ class block_timestat extends block_base {
             return $this->content;
         }
 
-        global $COURSE, $PAGE;
-        $contextid = $PAGE->cm ? $PAGE->cm->context->id : $PAGE->context->id;
+        global $COURSE;
+        $contextid = $this->page->cm ? $this->page->cm->context->id : $this->page->context->id;
         $this->page->requires->js_call_amd(
                 'block_timestat/event_emiiter',
                 'init',
