@@ -706,18 +706,18 @@ function block_timestat_print_log($course, $user = 0, $datefrom = 0, $dateto = 0
  * @param int $datefrom
  * @param int $dateto
  * @param string $order
- * @param int $page
- * @param int $perpage
- * @param string $url
+ * @param int $limitfrom
+ * @param int $limitnum
  * @param string $modname
  * @param int $modid
  * @param string $modaction
  * @param int $groupid
+ * @return array
  * @throws coding_exception
  */
 function block_timestat_build_logs_array($course, $user = 0, $datefrom = 0, $dateto = 0, $order = "l.timecreated ASC",
-        $limitfrom = '', $limitnum = '',
-        $modname = "", $modid = 0, $modaction = "", $groupid = 0) {
+        $limitfrom = 0, $limitnum = 0,
+        $modname = "", $modid = 0, $modaction = "", $groupid = 0): array {
 
     global $DB, $SESSION, $USER;
     // It is assumed that $date is the GMT time of midnight for that day,
@@ -811,14 +811,12 @@ function block_timestat_build_logs_array($course, $user = 0, $datefrom = 0, $dat
  * @param string $select SQL select criteria
  * @param array $params named sql type params
  * @param string $order SQL order by clause to sort the records returned
- * @param string $limitfrom return a subset of records, starting at this point (optional, required if $limitnum is set)
+ * @param int $limitfrom return a subset of records, starting at this point (optional, required if $limitnum is set)
  * @param int $limitnum return a subset comprising this many records (optional, required if $limitfrom is set)
  * @param int $totalcount Passed in by reference.
  * @return array
- * @package core
- * @category log
  */
-function block_timestat_get_logs($select, array $params = null, $order = 'l.timecreated DESC', $limitfrom = '', $limitnum = '',
+function block_timestat_get_logs($select, array $params = null, $order = 'l.timecreated DESC', $limitfrom = 0, $limitnum = 0,
         &$totalcount) {
 
     global $DB, $CFG;
