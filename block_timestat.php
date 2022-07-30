@@ -16,6 +16,7 @@
 
 /**
  * Contains the class for the timestat block.
+ *
  * @package    block_timestat
  * @copyright  2014 Barbara Dębska, Łukasz Sanokowski, Łukasz Musiał
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -44,10 +45,14 @@ class block_timestat extends block_base {
     }
 
     /**
+     * Creates the block's main content
+     *
+     * @return string
      * @throws coding_exception
+     * @throws dml_exception
      * @throws moodle_exception
      */
-    public function get_content() {
+    public function get_content(): string {
         if ($this->content !== null) {
             return $this->content;
         }
@@ -93,6 +98,7 @@ class block_timestat extends block_base {
     /**
      * Are you going to allow multiple instances of each block?
      * If yes, then it is assumed that the block WILL USE per-instance configuration
+     *
      * @return boolean
      */
     public function instance_allow_multiple() {

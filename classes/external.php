@@ -30,10 +30,13 @@ require_once($CFG->libdir . '/externallib.php');
 require_once($CFG->dirroot . '/blocks/timestat/locallib.php');
 
 use core_course\external\course_summary_exporter;
+use dml_exception;
 use external_api;
 use external_function_parameters;
 use external_value;
 use external_single_structure;
+use invalid_parameter_exception;
+use moodle_exception;
 
 /**
  * This is the external API for this component.
@@ -58,11 +61,15 @@ class external extends external_api {
     }
 
     /**
-     * @param string $timespent The user time spent
-     * @param string $registerid The log id
-     * @throws \dml_exception
-     * @throws \invalid_parameter_exception
-     * @throws \moodle_exception
+     *
+     * Update the register to save the timespent in a specific log.
+     *
+     * @param int $timespent The user time spent
+     * @param int $registerid The log id
+     * @return array
+     * @throws dml_exception
+     * @throws invalid_parameter_exception
+     * @throws moodle_exception
      */
     public static function update_register(int $timespent, int $registerid): array {
         global $DB, $USER;
@@ -72,7 +79,7 @@ class external extends external_api {
         );
         $log = get_log_by_id($registerid);
         if ($log->userid !== $USER->id) {
-            throw new \moodle_exception('You are not allowed to update this log');
+            throw new moodle_exception('You are not allowed to update this log');
         }
         $recordtimestat = $DB->get_record('block_timestat', array('log_id' => $params['registerid']));
 
