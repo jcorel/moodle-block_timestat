@@ -84,7 +84,7 @@ function block_timestat_report_log_print_mnet_selector_form($hostid, $course, $s
         $context = context_course::instance($course->id);
 
         // Setup for group handling.
-        if ($course->groupmode == SEPARATEGROUPS and !has_capability('moodle/site:accessallgroups', $context)) {
+        if ($course->groupmode == SEPARATEGROUPS && !has_capability('moodle/site:accessallgroups', $context)) {
             $selectedgroup = -1;
             $showgroups = false;
         } else if ($course->groupmode) {
@@ -918,7 +918,7 @@ class block_timestat_calendar extends moodleform {
  * @param int $groupid
  * @throws coding_exception
  */
-function block_timestat_print_log_xls($course, $user, $datefrom, $dateto, $order = 'l.time DESC', 
+function block_timestat_print_log_xls($course, $user, $datefrom, $dateto, $order = 'l.time DESC',
                                       $modname, $modid, $modaction, $groupid) {
 
     global $CFG, $DB;
