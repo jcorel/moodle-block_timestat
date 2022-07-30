@@ -45,14 +45,11 @@ class block_timestat extends block_base {
     }
 
     /**
-     * Creates the block's main content
+     * Returns the contents.
      *
-     * @return string
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws moodle_exception
+     * @return stdClass contents of block
      */
-    public function get_content(): string {
+    public function get_content() {
         if ($this->content !== null) {
             return $this->content;
         }
