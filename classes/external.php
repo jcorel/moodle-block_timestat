@@ -82,7 +82,7 @@ class external extends external_api {
                 self::update_register_parameters(),
                 ['timespent' => $timespent, 'contextid' => $contextid]
         );
-        $log = get_user_last_log_by_contextid($contextid);
+        $log = block_timestat_get_user_last_log_by_contextid($contextid);
         if ($log->userid !== $USER->id) {
             throw new moodle_exception('You are not allowed to update this log');
         }

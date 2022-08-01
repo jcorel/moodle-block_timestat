@@ -1041,7 +1041,7 @@ function block_timestat_seconds_to_stringtime($seconds) {
  * @return stdClass
  * @throws dml_exception
  */
-function get_log_by_id(int $logid): stdClass {
+function block_timestat_get_log_by_id(int $logid): stdClass {
     global $DB;
     return $DB->get_record('logstore_standard_log', array('id' => $logid));
 }
@@ -1053,7 +1053,7 @@ function get_log_by_id(int $logid): stdClass {
  * @param int $courseid
  * @throws dml_exception
  */
-function get_user_last_log_in_course(int $userid, int $courseid): stdClass {
+function block_timestat_get_user_last_log_in_course(int $userid, int $courseid): stdClass {
     global $DB;
     $logs = $DB->get_records('logstore_standard_log',
             array('userid' => $userid, 'courseid' => $courseid), 'timecreated DESC', '*', 0, 1);
@@ -1066,7 +1066,7 @@ function get_user_last_log_in_course(int $userid, int $courseid): stdClass {
  * @param int $contextid
  * @throws dml_exception
  */
-function get_user_last_log_by_contextid(int $contextid): stdClass {
+function block_timestat_get_user_last_log_by_contextid(int $contextid): stdClass {
     global $DB, $USER;
     $logs = $DB->get_records('logstore_standard_log',
             array('contextid' => $contextid, 'userid' => $USER->id), 'timecreated DESC', '*', 0, 1);
