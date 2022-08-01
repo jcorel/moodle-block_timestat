@@ -29,6 +29,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/externallib.php');
 require_once($CFG->dirroot . '/blocks/timestat/locallib.php');
 
+use context;
 use core_course\external\course_summary_exporter;
 use dml_exception;
 use external_api;
@@ -73,6 +74,10 @@ class external extends external_api {
      */
     public static function update_register(int $timespent, int $contextid): array {
         global $DB, $USER;
+
+        $context = context::instance_by_id($contextid);
+        self::validate_context($context);
+        
         $params = self::validate_parameters(
                 self::update_register_parameters(),
                 ['timespent' => $timespent, 'contextid' => $contextid]
