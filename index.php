@@ -22,6 +22,9 @@
  * @copyright  2014 Barbara Dębska, Łukasz Sanokowski, Łukasz Musiał
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+use core\session\manager;
+
 require('../../config.php');
 global $CFG;
 require_once($CFG->dirroot . '/blocks/timestat/locallib.php');
@@ -158,7 +161,7 @@ $adminediting = optional_param('adminedit', -1, PARAM_BOOL);
 if ($PAGE->user_allowed_editing() && $adminediting != -1) {
     $USER->editing = $adminediting;
 }
-\core\session\manager::write_close();
+manager::write_close();
 
 if (!empty($chooselog)) {
     $userinfo = get_string('allparticipants');
@@ -177,9 +180,9 @@ if (!empty($chooselog)) {
 
     switch ($logformat) {
         case 'downloadasexcel':
-            if (!block_timestat_print_log_xls($course, $user, $datefrom, $dateto, 'l.time DESC', $modname,
-                    $modid, $modaction, $group)) {
-                echo $OUTPUT->notification("No logs found!");
+            if (!block_timestat_print_log_xls($course, $user, $datefrom, $dateto, $modname, $modid,
+                    $modaction, $group, 'l.time DESC')) {
+                echo $OUTPUT->notification(get_string('nologs', 'block_timestat'));
                 echo $OUTPUT->footer();
             }
             exit;
@@ -199,8 +202,8 @@ if (!empty($chooselog)) {
             }
 
             echo $OUTPUT->heading(format_string($course->fullname) . ": $userinfo, $datefrominfo (" . usertimezone() . ")");
-            block_timestat_report_log_print_mnet_selector_form($hostid, $course, $user, $datefrom, $dateto, $modname, $modid,
-                    $modaction, $group, $showcourses, $showusers, $logformat);
+            block_timestat_report_log_print_mnet_selector_form($hostid, $course, $user, $datefrom, $dateto, $modid, $group,
+                    $showcourses, $showusers, $logformat);
 
             if ($hostid == $CFG->mnet_localhost_id) {
                 block_timestat_print_log($course, $user, $datefrom, $dateto, 'l.timecreated DESC', $page, $perpage,
@@ -228,8 +231,8 @@ if (!empty($chooselog)) {
 
     echo $OUTPUT->heading(get_string('chooselogs') . ':');
 
-    block_timestat_report_log_print_selector_form($course, $user, $datefrom, $dateto, $modname, $modid, $modaction,
-            $group, $showcourses, $showusers, $logformat);
+    block_timestat_report_log_print_selector_form($course, $user, $datefrom, $modname, $modaction,
+            $group, $showcourses, $showusers);
 }
 
 echo $OUTPUT->footer();

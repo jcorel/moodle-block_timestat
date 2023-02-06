@@ -40,9 +40,7 @@ if (!defined('REPORT_LOG_MAX_DISPLAY')) {
  * @param int $selecteduser id of the selected user
  * @param string $selecteddatefrom Date from selected
  * @param string $selecteddateto Date to selected
- * @param string $modname course_module->id
  * @param int $modid number or 'site_errors'
- * @param string $modaction an action as recorded in the logs
  * @param int $selectedgroup Group to display
  * @param int $showcourses whether to show courses if we're over our limit.
  * @param int $showusers whether to show users if we're over our limit.
@@ -57,10 +55,10 @@ if (!defined('REPORT_LOG_MAX_DISPLAY')) {
  * @uses SEPARATEGROUPS
  */
 function block_timestat_report_log_print_mnet_selector_form($hostid, $course, $selecteduser = 0, $selecteddatefrom = 'today',
-        $selecteddateto = 'today', $modname = "", $modid = 0, $modaction = '', $selectedgroup = -1, $showcourses = 0,
+        $selecteddateto = 'today', $modid = 0, $selectedgroup = -1, $showcourses = 0,
         $showusers = 0, $logformat = 'showashtml'): void {
 
-    global $USER, $CFG, $SITE, $DB, $OUTPUT, $SESSION;
+    global $USER, $CFG, $SITE, $DB, $SESSION;
     require_once($CFG->dirroot . '/mnet/peer.php');
 
     $mnetpeer = new mnet_peer();
@@ -359,9 +357,7 @@ function block_timestat_report_log_print_mnet_selector_form($hostid, $course, $s
  * @param stdClass $course course instance
  * @param int $selecteduser id of the selected user
  * @param string $selecteddate Date selected
- * @param string $modname course_module->id
  * @param string $modid number or 'site_errors'
- * @param string $modaction an action as recorded in the logs
  * @param int $selectedgroup Group to display
  * @param int $showcourses whether to show courses if we're over our limit.
  * @param int $showusers whether to show users if we're over our limit.
@@ -372,11 +368,11 @@ function block_timestat_report_log_print_mnet_selector_form($hostid, $course, $s
  * @uses CONTEXT_COURSE
  * @uses SEPARATEGROUPS
  */
-function block_timestat_report_log_print_selector_form($course, $selecteduser = 0, $selecteddate = 'today',
-        $modname = "", $modid = 0, $modaction = '', $selectedgroup = -1, $showcourses = 0, $showusers = 0,
+function block_timestat_report_log_print_selector_form($course, $selecteduser = 0, $selecteddate = 'today', $modid = 0,
+        $selectedgroup = -1, $showcourses = 0, $showusers = 0,
         $logformat = 'showashtml') {
 
-    global $USER, $CFG, $DB, $OUTPUT, $SESSION;
+    global $USER, $CFG, $DB, $SESSION;
 
     // First check to see if we can override showcourses and showusers.
     $numcourses = $DB->count_records("course");
@@ -617,11 +613,11 @@ function block_timestat_report_log_print_selector_form($course, $selecteduser = 
 function block_timestat_print_log($course, $user = 0, $datefrom = 0, $dateto = 0, $order = "l.timecreated ASC", $page = 0,
         $perpage = 100, $url = "", $modname = "", $modid = 0, $modaction = "", $groupid = 0) {
 
-    global $CFG, $DB, $OUTPUT;
+    global $CFG, $OUTPUT;
 
     if (!$logs = block_timestat_build_logs_array($course, $user, $datefrom, $dateto, $order, $page * $perpage, $perpage,
             $modname, $modid, $modaction, $groupid)) {
-        echo $OUTPUT->notification("No logs found!");
+        echo $OUTPUT->notification(get_string('nologs', 'block_timestat'));
         echo $OUTPUT->footer();
         exit;
     }
@@ -680,7 +676,7 @@ function block_timestat_print_log($course, $user = 0, $datefrom = 0, $dateto = 0
             if (empty($log->course)) {
                 $row[] = get_string('site');
             } else {
-                $row[] = "<a href=\"{$CFG->wwwroot}/course/view.php?id={$log->course}\">" .
+                $row[] = "<a href=\"$CFG->wwwroot/course/view.php?id=$log->course\">" .
                         format_string($courses[$log->course]) . "</a>";
             }
         }
@@ -799,7 +795,7 @@ function block_timestat_build_logs_array($course, $user = 0, $datefrom = 0, $dat
     $selector = implode(' AND ', $joins);
     $totalcount = 0;  // Initialise.
     $result = array();
-    $result['logs'] = block_timestat_get_logs($selector, $params, $order, $limitfrom, $limitnum, $totalcount);
+    $result['logs'] = block_timestat_get_logs($selector, $params, $limitfrom, $limitnum, $totalcount);
     $result['totalcount'] = $totalcount;
     return $result;
 }
@@ -809,14 +805,12 @@ function block_timestat_build_logs_array($course, $user = 0, $datefrom = 0, $dat
  *
  * @param string $select SQL select criteria
  * @param array $params named sql type params
- * @param string $order SQL order by clause to sort the records returned
  * @param int $limitfrom return a subset of records, starting at this point (optional, required if $limitnum is set)
  * @param int $limitnum return a subset comprising this many records (optional, required if $limitfrom is set)
  * @param int $totalcount Passed in by reference.
  * @return array
  */
-function block_timestat_get_logs($select, array $params = null, $order = 'l.timecreated DESC', $limitfrom = 0, $limitnum = 0,
-        &$totalcount) {
+function block_timestat_get_logs($select, array $params = null, $limitfrom = 0, $limitnum = 0, &$totalcount) {
 
     global $DB, $CFG;
 
@@ -824,11 +818,7 @@ function block_timestat_get_logs($select, array $params = null, $order = 'l.time
     $countsql = "";
     $userid = "";
     $andcount = "";
-    if (isset($params['userid'])) {
-        $userid = $params['userid'];
-    } else {
-        $userid = 0;
-    }
+    $userid = $params['userid'] ?? 0;
 
     if ($CFG->dbtype != 'mysqli') {
         $select = str_replace('l.', 'l2.', $select);
@@ -911,17 +901,16 @@ class block_timestat_calendar extends moodleform {
  * @param int $user
  * @param int $datefrom
  * @param int $dateto
- * @param string $order
  * @param string $modname
  * @param int $modid
  * @param string $modaction
  * @param int $groupid
+ * @param string $order
  * @throws coding_exception
  */
-function block_timestat_print_log_xls($course, $user, $datefrom, $dateto, $order = 'l.time DESC',
-                                      $modname, $modid, $modaction, $groupid) {
+function block_timestat_print_log_xls($course, $user, $datefrom, $dateto, $modname, $modid, $modaction, $groupid, $order = 'l.time DESC') {
 
-    global $CFG, $DB;
+    global $CFG;
 
     require_once("$CFG->libdir/excellib.class.php");
 
@@ -1006,7 +995,7 @@ function block_timestat_print_log_xls($course, $user, $datefrom, $dateto, $order
  *
  * @param int $seconds
  * @return string
- * @throws dml_exception
+ * @throws dml_exception|coding_exception
  */
 function block_timestat_seconds_to_stringtime($seconds) {
     $conmin = 60;
@@ -1017,7 +1006,7 @@ function block_timestat_seconds_to_stringtime($seconds) {
     $seconds = $seconds - $tempday * $conday;
     $temphour = (int) ((int) $seconds / (int) $conhour);
     $seconds = $seconds - $temphour * $conhour;
-    $tempmin = (int) ((int) $seconds / (int) $conmin);
+    $tempmin = (int) ((int) $seconds / $conmin);
     $seconds = $seconds - $tempmin * $conmin;
 
     $str = '';
@@ -1030,34 +1019,7 @@ function block_timestat_seconds_to_stringtime($seconds) {
     if ($tempmin != 0) {
         $str = $str . $tempmin . get_string('minuts', 'block_timestat');
     }
-    $str = $str . $seconds . get_string('seconds', 'block_timestat');
-    return $str;
-}
-
-/**
- * Function to get a log by id
- *
- * @param int $logid
- * @return stdClass
- * @throws dml_exception
- */
-function block_timestat_get_log_by_id(int $logid): stdClass {
-    global $DB;
-    return $DB->get_record('logstore_standard_log', array('id' => $logid));
-}
-
-/**
- * Function to get the user last log in a specific course
- *
- * @param int $userid
- * @param int $courseid
- * @throws dml_exception
- */
-function block_timestat_get_user_last_log_in_course(int $userid, int $courseid): stdClass {
-    global $DB;
-    $logs = $DB->get_records('logstore_standard_log',
-            array('userid' => $userid, 'courseid' => $courseid), 'timecreated DESC', '*', 0, 1);
-    return reset($logs);
+    return $str . $seconds . get_string('seconds', 'block_timestat');
 }
 
 /**

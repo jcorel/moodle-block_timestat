@@ -47,23 +47,26 @@ class block_timestat extends block_base {
     /**
      * Returns the contents.
      *
-     * @return stdClass contents of block
+     * @return stdObject contents of block
      * @throws dml_exception
+     * @throws moodle_exception
      */
     public function get_content() {
+        global $USER;
         if ($this->content !== null) {
             return $this->content;
         }
 
         global $COURSE;
         $contextid = $this->page->cm ? $this->page->cm->context->id : $this->page->context->id;
-        $this->page->requires->js_call_amd(
-                'block_timestat/event_emiiter',
-                'init',
-                [$contextid]
-        );
+        if (!is_siteadmin($USER->id)) {
+            $this->page->requires->js_call_amd(
+                    'block_timestat/event_emiiter',
+                    'init',
+                    [$contextid]
+            );
+        }
         $context = context_block::instance($this->instance->id);
-
         if (!has_capability('block/timestat:view', $context)) {
             $this->content = null;
             return $this->content;

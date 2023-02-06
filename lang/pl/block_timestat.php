@@ -26,6 +26,7 @@
 $string['blockname'] = 'Timestat';
 $string['pluginname'] = 'Timestat';
 $string['blocktitle'] = 'Timestat';
+$string['nologs'] = 'Nie znaleziono żadnych logów!';
 $string['calculate'] = 'Oblicz czas';
 $string['link'] = 'Oblicz czas';
 $string['summary'] = 'Czas całkowity';
