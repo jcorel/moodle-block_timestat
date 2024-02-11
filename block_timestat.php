@@ -66,7 +66,7 @@ class block_timestat extends block_base
         $canseetimer = has_capability('block/timestat:viewtimer', $context);
         $data = new stdClass();
         $data->courseid = $COURSE->id;
-        $data->shouldseetimer = $canseetimer || ($userisenrolled && $config->showtimer ?? false);
+        $data->shouldseetimer = $userisenrolled && ($canseetimer || ($config->showtimer ?? false));
         $data->shouldseereport = has_capability('block/timestat:viewreport', $context);
         $this->content->text = $OUTPUT->render_from_template('block_timestat/main', $data);
         // If the user is not enrolled in the course, we don't want to count the time.
