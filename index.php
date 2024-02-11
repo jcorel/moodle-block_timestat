@@ -146,7 +146,7 @@ require_login($course);
 
 $context = context_course::instance($course->id);
 
-require_capability('block/timestat:view', $context);
+require_capability('block/timestat:viewreport', $context);
 
 if (!empty($page)) {
     $strlogs = get_string('logs') . ": " . get_string('page', 'report_log', $page + 1);
