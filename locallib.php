@@ -795,7 +795,7 @@ function block_timestat_build_logs_array($course, $user = 0, $datefrom = 0, $dat
     $selector = implode(' AND ', $joins);
     $totalcount = 0;  // Initialise.
     $result = array();
-    $result['logs'] = block_timestat_get_logs($selector, $params, $limitfrom, $limitnum, $totalcount);
+    $result['logs'] = block_timestat_get_logs($selector, $totalcount, $params, $limitfrom, $limitnum);
     $result['totalcount'] = $totalcount;
     return $result;
 }
@@ -804,13 +804,13 @@ function block_timestat_build_logs_array($course, $user = 0, $datefrom = 0, $dat
  * Select all log records based on SQL criteria
  *
  * @param string $select SQL select criteria
+ * @param int $totalcount Passed in by reference.
  * @param array $params named sql type params
  * @param int $limitfrom return a subset of records, starting at this point (optional, required if $limitnum is set)
  * @param int $limitnum return a subset comprising this many records (optional, required if $limitfrom is set)
- * @param int $totalcount Passed in by reference.
  * @return array
  */
-function block_timestat_get_logs($select, array $params = null, $limitfrom = 0, $limitnum = 0, &$totalcount) {
+function block_timestat_get_logs($select, &$totalcount, array $params = null, $limitfrom = 0, $limitnum = 0) {
 
     global $DB, $CFG;
 
