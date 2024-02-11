@@ -58,7 +58,9 @@
 {{/shouldseetimer}}
 
 {{#shouldseereport}}
-    <a href="/blocks/timestat/index.php?id={{courseid}}" class="btn btn-primary d-flex w-50 align-items-center mx-auto">
+    <div class="d-flex justify-content-center">
+        <a href="/blocks/timestat/index.php?id={{courseid}}" class="btn btn-primary">
         <i class="icon fa fa-bar-chart"></i> {{#str}}viewreport, block_timestat{{/str}}
-    </a>
+        </a>
+    </div>
 {{/shouldseereport}}
