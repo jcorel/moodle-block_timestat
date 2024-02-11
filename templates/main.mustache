@@ -1,0 +1,64 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template block_timestat/main
+
+    This template will render the main block content.
+
+    Variables required for this template:
+    * shouldseetimer - Whether the timer should be displayed.
+    * shouldseereport - Whether the report button should be displayed.
+    * coursetime - The time the course is set to.
+    * courseid - The id of the course.
+
+    Example context (json):
+    {
+        "shouldseetimer": true,
+        "shouldseereport": true,
+        "coursetime": "10:15:30",
+        "courseid": "1234"
+    }
+
+}}
+
+{{#shouldseetimer}}
+    <div class='timer-container mb-1'>
+        <div class='timer-display w-100'>
+            <p class='h3' id='timer'>00:00:00</p>
+            <div class="moreinfo d-none">
+                <div class="info-text">
+                    <span class='info-label'>{{#str}}reportedtime, block_timestat{{/str}}: </span>
+                    <span class='info-value' id='reportedtime'>00:00:00</span>
+                </div>
+                <div class="info-text">
+                    <span class='info-label'>{{#str}}inactivitytime, block_timestat{{/str}}: </span>
+                    <span class='info-value' id='inactivitytime'>00:00:00</span>
+                </div>
+                <div class="info-text">
+                    <span class='info-label'>{{#str}}inactivitytime, block_timestat{{/str}}: </span>
+                    <span class='info-value' id='inactivitytime'>{{coursetime}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+{{/shouldseetimer}}
+
+{{#shouldseereport}}
+    <a href="/blocks/timestat/index.php?id={{courseid}}" class="btn btn-primary d-flex w-50 align-items-center mx-auto">
+        <i class="icon fa fa-bar-chart"></i> {{#str}}viewreport, block_timestat{{/str}}
+    </a>
+{{/shouldseereport}}

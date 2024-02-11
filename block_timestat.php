@@ -32,8 +32,9 @@ require_once($CFG->dirroot . '/blocks/timestat/locallib.php');
  * @copyright  2014 Barbara Dębska, Łukasz Sanokowski, Łukasz Musiał
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class block_timestat extends block_base {
-
+class block_timestat extends block_base
+{
+    
     /**
      * Initialises the block.
      *
@@ -43,42 +44,38 @@ class block_timestat extends block_base {
     public function init() {
         $this->title = get_string('blocktitle', 'block_timestat');
     }
-
+    
     /**
      * Returns the contents.
      *
-     * @return stdObject contents of block
+     * @return stdClass contents of block
      * @throws dml_exception
      * @throws moodle_exception
      */
     public function get_content() {
-        global $USER;
+        global $COURSE, $OUTPUT;
         if ($this->content !== null) {
             return $this->content;
         }
-
-        global $COURSE;
         $contextid = $this->page->cm ? $this->page->cm->context->id : $this->page->context->id;
-        if (!is_siteadmin($USER->id)) {
-            $this->page->requires->js_call_amd(
-                    'block_timestat/event_emiiter',
-                    'init',
-                    [$contextid]
-            );
-        }
         $context = context_block::instance($this->instance->id);
-        if (!has_capability('block/timestat:view', $context)) {
-            $this->content = null;
-            return $this->content;
+        $userisenrolled = is_enrolled($context);
+        $config = get_config('block_timestat');
+        $this->content = new stdClass();
+        $this->content->text = '';
+        $canseetimer = has_capability('block/timestat:viewtimer', $context);
+        $data = new stdClass();
+        $data->courseid = $COURSE->id;
+        $data->shouldseetimer = $canseetimer || ($userisenrolled && $config->showtimer ?? false);
+        $data->shouldseereport = has_capability('block/timestat:viewreport', $context);
+        $this->content->text = $OUTPUT->render_from_template('block_timestat/main', $data);
+        // If the user is not enrolled in the course, we don't want to count the time.
+        if ($userisenrolled) {
+            $this->page->requires->js_call_amd('block_timestat/event_emiiter', 'init', [$contextid, $config]);
         }
-
-        $this->content = new stdClass;
-        $url = new moodle_url('/blocks/timestat/index.php', ['id' => $COURSE->id]);
-        $this->content->text = html_writer::link($url, get_string('link', 'block_timestat'));
-        $this->content->footer = null;
         return $this->content;
     }
-
+    
     /**
      * Defines where the block can be added.
      *
@@ -86,22 +83,28 @@ class block_timestat extends block_base {
      */
     public function applicable_formats() {
         return array(
-                'site-index' => false,
-                'course-view' => true,
-                'course-view-social' => true,
-                'mod' => true,
-                'mod-quiz' => true,
-                'course' => true
+            'site-index' => false,
+            'course-view' => true,
+            'course-view-social' => true,
+            'mod' => true,
+            'mod-quiz' => true,
+            'course' => true
         );
     }
-
-    /**
-     * Are you going to allow multiple instances of each block?
-     * If yes, then it is assumed that the block WILL USE per-instance configuration
-     *
-     * @return boolean
-     */
+    
+    function has_config() {
+        return true;
+    }
+    
     public function instance_allow_multiple() {
         return false;
+    }
+    
+    public function get_config_for_external() {
+        $configs = get_config('block_timestat');
+        return (object)[
+            'instance' => new stdClass(),
+            'plugin' => $configs,
+        ];
     }
 }

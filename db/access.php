@@ -27,29 +27,50 @@ defined('MOODLE_INTERNAL') || die();
 $capabilities = array(
     'block/timestat:view' => array(
         'captype' => 'read',
-          'contextlevel' => CONTEXT_BLOCK,
-          'archetypes' => array (
-              'guest' => CAP_PREVENT,
-              'user' => CAP_PREVENT,
-              'student' => CAP_PREVENT,
-              'teacher' => CAP_ALLOW,
-              'editingteacher' => CAP_ALLOW,
-              'coursecreator' => CAP_ALLOW,
-              'manager' => CAP_ALLOW
-          )
-      ),
-
-
+        'contextlevel' => CONTEXT_BLOCK,
+        'archetypes' => array(
+            'guest' => CAP_PREVENT,
+            'user' => CAP_PREVENT,
+            'student' => CAP_ALLOW,
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'coursecreator' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        )
+    ),
+    'block/timestat:viewreport' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_BLOCK,
+        'archetypes' => array(
+            'guest' => CAP_PREVENT,
+            'user' => CAP_PREVENT,
+            'student' => CAP_PREVENT,
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'coursecreator' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        )
+    ),
+    'block/timestat:viewtimer' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_BLOCK,
+        'archetypes' => array(
+            'guest' => CAP_PREVENT,
+            'user' => CAP_PREVENT,
+            'student' => CAP_PREVENT,
+            'teacher' => CAP_PREVENT,
+            'editingteacher' => CAP_PREVENT,
+            'coursecreator' => CAP_PREVENT,
+            'manager' => CAP_ALLOW
+        )
+    ),
     'block/timestat:addinstance' => array(
         'riskbitmask' => RISK_SPAM | RISK_XSS,
-
         'captype' => 'write',
         'contextlevel' => CONTEXT_BLOCK,
         'archetypes' => array(
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW
         ),
-
-
     ),
 );
