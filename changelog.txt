@@ -1,3 +1,10 @@
+11.02.2024
+Refactor Screentime to remove jQuery dependency and add more detailed callbacks
+Enhanced to detect user inactivity.
+Add optional visual timer to show time spent on the page.
+Refactor the event emiter module to use the new ScreenTime
+Minor fixes
+
 08.09.2015
 1.2.2.1
 Fixed problem with blank page after logging in

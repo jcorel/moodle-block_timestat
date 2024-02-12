@@ -1,33 +1,25 @@
 # Timestat block for Moodle
 
-This block measure time of real activity done by Moodle users. Measured activity time is incremented only when Moodle tab in web browser is active (it is done via Javascript).
+This block measure time of real activity done by Moodle users.
 
 ## Installation
 
-Install block in standard way (copy it to '/moodle/blocks' folder and click 'Notifications' in admin panel)
-
-IMPORTANT FOR USERS OF PREVIOUS VERSIONS (less than 2014090400):
-Previous versions of this app used column named 'timespent' in 'log' table. Now time is stored in table 'block_timestat'.
-It is recommended to uninstall previous version first and install this new version next.
-
-BACKUP YOUR DATABASE BEFORE EXECUTING FOLLOWING QUERIES:
-
-Old data can be copied to new table with query:
-INSERT INTO mdl_block_timestat (log_id, timespent) SELECT id, timespent FROM mdl_log;
-
-After this the field 'timestpent' can be removed from table 'mdl_log':
-ALTER TABLE mdl_log DROP timespent;
+Install block in standard way (copy it to '/moodle/blocks' folder and click 'Notifications' in admin panel) or install it directly from the Admin panel.
 
 ## Usage
 
 The block only counts the time on the pages to which it has been added, so you need to add the block on the pages where you want to count the time. If you want to add the block on the course page and on all activity pages at once, please refer to the following documentation:
 https://docs.moodle.org/400/en/Block_settings#Making_a_block_sticky_throughout_a_course
 
-The content of the block displays a link to a time spent report. This report allows filtering by course, activity and user. By default this report is only visible by the following roles: editingteacher, teacher, coursecreator, manager and admin. The 'block/timestat:view' capability allows to extend this permission to other roles.
+The block accounts for student *inactivity*, identified by no interactions such as clicks or scrolling. To prevent counting time during periods of inactivity, the tracking feature automatically pauses when a student is inactive for an extended period. You can customize the maximum inactivity time in the settings. It's also possible to adjust how often the recorded time is saved.
+
+The block offers a *visual time counter*, visible to users with specific permissions or to all users enrolled in the course, if enabled in the settings. *Time is tracked even if the block or counter isn't visible to a student*. Additionally, the block includes a link to a detailed *report* on time spent, with filters for course, activity, and user. Initially, only roles such as editing teachers, teachers, course creators, managers, and admins can access this report. The 'block/timestat:viewreport' capability allows extending access to other roles.
+
+You can access the plugin *settings* from *Site Administration > Plugins > Blocks > Timestat*.
 
 ## More information
 
-This application was developed in cooperation by team composed of:
+The version of the plugin for Moodle 2.9 and earlier was developed by:
 Barbara Dębska
 Łukasz Musiał
 Łukasz Sanokowski
@@ -37,11 +29,6 @@ Classroom Revolution
 Lib Ertea
 Mart van der Niet
 Joseph Thibault
-
-## Contact
-
-mostly prefered by forum discussion:
-http://moodle.org/mod/forum/discuss.php?d=167732
 
 ## License
 
