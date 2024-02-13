@@ -24,7 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2024021002;
+$plugin->version = 2024021301;
 $plugin->component = 'block_timestat';
 $plugin->maturity   = MATURITY_STABLE;
 $plugin->requires = 2021051700;
