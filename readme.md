@@ -13,7 +13,7 @@ https://docs.moodle.org/400/en/Block_settings#Making_a_block_sticky_throughout_a
 
 The block accounts for student *inactivity*, identified by no interactions such as clicks or scrolling. To prevent counting time during periods of inactivity, the tracking feature automatically pauses when a student is inactive for an extended period. You can customize the maximum inactivity time in the settings. It's also possible to adjust how often the recorded time is saved.
 
-The block offers a *visual time counter*, visible to users with specific permissions or to all users enrolled in the course, if enabled in the settings. *Time is tracked even if the block or counter isn't visible to a student*. Additionally, the block includes a link to a detailed *report* on time spent, with filters for course, activity, and user. Initially, only roles such as editing teachers, teachers, course creators, managers, and admins can access this report. The 'block/timestat:viewreport' capability allows extending access to other roles.
+The block offers a *visual time counter*, visible to users with specific permissions (block/timestat:viewtimer) or to all users enrolled in the course, if enabled in the settings. *Time is tracked even if the block or counter isn't visible to a student*. Additionally, the block includes a link to a detailed *report* on time spent, with filters for course, activity, and user. Initially, only roles such as editing teachers, teachers, course creators, managers, and admins can access this report. The 'block/timestat:viewreport' capability allows extending access to other roles.
 
 You can access the plugin *settings* from *Site Administration > Plugins > Blocks > Timestat*.
 
