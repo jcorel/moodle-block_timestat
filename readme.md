@@ -15,6 +15,8 @@ The block accounts for student *inactivity*, identified by no interactions such 
 
 The block offers a *visual time counter*, visible to users with specific permissions (block/timestat:viewtimer) or to all users enrolled in the course, if enabled in the settings. *Time is tracked even if the block or counter isn't visible to a student*. Additionally, the block includes a link to a detailed *report* on time spent, with filters for course, activity, and user. Initially, only roles such as editing teachers, teachers, course creators, managers, and admins can access this report. The 'block/timestat:viewreport' capability allows extending access to other roles.
 
+To use the block within the *Quiz attempt page*, configure the quiz settings to 'Show blocks during the attempt' by going to Quiz > Edit Settings > Appearance > Show more.
+
 You can access the plugin *settings* from *Site Administration > Plugins > Blocks > Timestat*.
 
 ## More information
