@@ -32,8 +32,7 @@ require_once($CFG->dirroot . '/blocks/timestat/locallib.php');
  * @copyright  2014 Barbara Dębska, Łukasz Sanokowski, Łukasz Musiał
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class block_timestat extends block_base
-{
+class block_timestat extends block_base {
     
     /**
      * Initialises the block.
@@ -92,7 +91,7 @@ class block_timestat extends block_base
         );
     }
     
-    function has_config() {
+    public function has_config() {
         return true;
     }
     
