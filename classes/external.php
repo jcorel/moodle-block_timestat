@@ -54,10 +54,10 @@ class external extends external_api {
      */
     public static function update_register_parameters(): external_function_parameters {
         return new external_function_parameters(
-                array(
+                [
                         'timespent' => new external_value(PARAM_INT),
                         'contextid' => new external_value(PARAM_INT),
-                )
+                ]
         );
     }
 
@@ -77,7 +77,6 @@ class external extends external_api {
 
         $context = context::instance_by_id($contextid);
         self::validate_context($context);
-        
         $params = self::validate_parameters(
                 self::update_register_parameters(),
                 ['timespent' => $timespent, 'contextid' => $contextid]
@@ -86,7 +85,7 @@ class external extends external_api {
         if ($log->userid !== $USER->id) {
             throw new moodle_exception('You are not allowed to update this log');
         }
-        $recordtimestat = $DB->get_record('block_timestat', array('log_id' => $log->id));
+        $recordtimestat = $DB->get_record('block_timestat', ['log_id' => $log->id]);
 
         if (!$recordtimestat) {
             $recordbt = new \stdClass();

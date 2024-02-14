@@ -111,7 +111,7 @@ function block_timestat_report_log_print_mnet_selector_form($hostid, $course, $s
     }
 
     // Get all the possible users.
-    $users = array();
+    $users = [];
 
     // Define limitfrom and limitnum for queries below.
     // If $showusers is enabled... don't apply limitfrom and limitnum.
@@ -123,7 +123,7 @@ function block_timestat_report_log_print_mnet_selector_form($hostid, $course, $s
         $courseusers = get_enrolled_users($context, '', $selectedgroup, 'u.id, ' . $allusernamefields,
                 null, $limitfrom, $limitnum);
     } else {
-        $courseusers = $DB->get_records('user', array('deleted' => 0), 'lastaccess DESC', 'id, ' . $allusernamefields,
+        $courseusers = $DB->get_records('user', ['deleted' => 0], 'lastaccess DESC', 'id, ' . $allusernamefields,
                 $limitfrom, $limitnum);
     }
 
@@ -161,11 +161,11 @@ function block_timestat_report_log_print_mnet_selector_form($hostid, $course, $s
     $hostarray[$CFG->mnet_localhost_id] = $SITE->fullname;
     asort($hostarray);
 
-    $dropdown = array();
+    $dropdown = [];
 
     foreach ($hostarray as $hostid => $name) {
-        $courses = array();
-        $sites = array();
+        $courses = [];
+        $sites = [];
         if ($CFG->mnet_localhost_id == $hostid) {
             if (has_capability('report/log:view', $sitecontext) && $showcourses) {
                 if ($ccc = $DB->get_records("course", null, "fullname", "id,shortname,fullname,category")) {
@@ -181,7 +181,7 @@ function block_timestat_report_log_print_mnet_selector_form($hostid, $course, $s
         } else {
             if (has_capability('report/log:view', $sitecontext) && $showcourses) {
                 $sql = "SELECT DISTINCT course, coursename FROM {mnet_log} where hostid = ?";
-                if ($ccc = $DB->get_records_sql($sql, array($hostid))) {
+                if ($ccc = $DB->get_records_sql($sql, [$hostid])) {
                     foreach ($ccc as $cc) {
                         if (1 == $cc->course) { // TODO: this might be wrong - site course may have another id.
                             $sites["$hostid/$cc->course"] = $cc->coursename . ' (' . get_string('site') . ')';
@@ -194,10 +194,10 @@ function block_timestat_report_log_print_mnet_selector_form($hostid, $course, $s
         }
 
         asort($courses);
-        $dropdown[] = array($name => ($sites + $courses));
+        $dropdown[] = [$name => ($sites + $courses)];
     }
 
-    $activities = array();
+    $activities = [];
     $selectedactivity = "";
 
     $modinfo = get_fast_modinfo($course);
@@ -239,13 +239,13 @@ function block_timestat_report_log_print_mnet_selector_form($hostid, $course, $s
     asort($users);
 
     // Prepare the list of action options.
-    $actions = array(
+    $actions = [
             'view' => get_string('view'),
             'add' => get_string('add'),
             'update' => get_string('update'),
             'delete' => get_string('delete'),
-            '-view' => get_string('allchanges')
-    );
+            '-view' => get_string('allchanges'),
+    ];
 
     // Get all the possible dates.
     // Note that we are keeping track of real (GMT) time and user time.
@@ -257,10 +257,10 @@ function block_timestat_report_log_print_mnet_selector_form($hostid, $course, $s
     $timemidnight = $today = usergetmidnight($timenow);
 
     // Put today up the top of the list.
-    $dates = array(
+    $dates = [
             "0" => get_string('alldays'),
-            "$timemidnight" => get_string("today") . ", " . userdate($timenow, $strftimedate)
-    );
+            "$timemidnight" => get_string("today") . ", " . userdate($timenow, $strftimedate),
+    ];
 
     if (!$course->startdate || ($course->startdate > $timenow)) {
         $course->startdate = $course->timecreated;
@@ -287,13 +287,13 @@ function block_timestat_report_log_print_mnet_selector_form($hostid, $course, $s
     echo "<input type=\"hidden\" name=\"showcourses\" value=\"$showcourses\" />\n";
     if (has_capability('report/log:view', $sitecontext) && $showcourses) {
         $cid = empty($course->id) ? '1' : $course->id;
-        echo html_writer::label(get_string('selectacoursesite'), 'menuhost_course', false, array('class' => 'accesshide'));
+        echo html_writer::label(get_string('selectacoursesite'), 'menuhost_course', false, ['class' => 'accesshide']);
         echo html_writer::select($dropdown, "host_course", $hostid . '/' . $cid);
     } else {
-        $courses = array();
+        $courses = [];
         $courses[$course->id] = get_course_display_name_for_list($course) . ((empty($course->category)) ?
                         ' (' . get_string('site') . ') ' : '');
-        echo html_writer::label(get_string('selectacourse'), 'menuid', false, array('class' => 'accesshide'));
+        echo html_writer::label(get_string('selectacourse'), 'menuid', false, ['class' => 'accesshide']);
         echo html_writer::select($courses, "id", $course->id, false);
         if (has_capability('report/log:view', $sitecontext)) {
             $a = new stdClass();
@@ -309,24 +309,24 @@ function block_timestat_report_log_print_mnet_selector_form($hostid, $course, $s
                 $groups[$cgroup->id] = $cgroup->name;
             }
         } else {
-            $groups = array();
+            $groups = [];
         }
-        echo html_writer::label(get_string('selectagroup'), 'menugroup', false, array('class' => 'accesshide'));
+        echo html_writer::label(get_string('selectagroup'), 'menugroup', false, ['class' => 'accesshide']);
         echo html_writer::select($groups, "group", $selectedgroup, get_string("allgroups"));
     }
 
     if ($showusers) {
-        echo html_writer::label(get_string('participantslist'), 'menuuser', false, array('class' => 'accesshide'));
+        echo html_writer::label(get_string('participantslist'), 'menuuser', false, ['class' => 'accesshide']);
         echo html_writer::select($users, "user", $selecteduser, get_string("allparticipants"));
     } else {
-        $users = array();
+        $users = [];
         if (!empty($selecteduser)) {
-            $user = $DB->get_record('user', array('id' => $selecteduser));
+            $user = $DB->get_record('user', ['id' => $selecteduser]);
             $users[$selecteduser] = fullname($user);
         } else {
             $users[0] = get_string('allparticipants');
         }
-        echo html_writer::label(get_string('participantslist'), 'menuuser', false, array('class' => 'accesshide'));
+        echo html_writer::label(get_string('participantslist'), 'menuuser', false, ['class' => 'accesshide']);
         echo html_writer::select($users, "user", $selecteduser, false);
         $a = new stdClass();
         $a->url = "$CFG->wwwroot/blocks/timestat/index.php?chooselog=0&group=$selectedgroup&user=$selecteduser"
@@ -334,17 +334,17 @@ function block_timestat_report_log_print_mnet_selector_form($hostid, $course, $s
         print_string('logtoomanyusers', 'moodle', $a);
     }
 
-    echo html_writer::label(get_string('showreports'), 'menumodid', false, array('class' => 'accesshide'));
+    echo html_writer::label(get_string('showreports'), 'menumodid', false, ['class' => 'accesshide']);
     echo html_writer::select($activities, "modid", $selectedactivity, get_string("allactivities"));
-    echo html_writer::label(get_string('actions'), 'menumodaction', false, array('class' => 'accesshide'));
+    echo html_writer::label(get_string('actions'), 'menumodaction', false, ['class' => 'accesshide']);
 
-    $logformats = array('showashtml' => get_string('displayonpage'),
-            'downloadasexcel' => get_string('downloadexcel'));
-    echo html_writer::label(get_string('logsformat', 'report_log'), 'menulogformat', false, array('class' => 'accesshide'));
+    $logformats = ['showashtml' => get_string('displayonpage'),
+            'downloadasexcel' => get_string('downloadexcel')];
+    echo html_writer::label(get_string('logsformat', 'report_log'), 'menulogformat', false, ['class' => 'accesshide']);
     echo html_writer::select($logformats, 'logformat', $logformat, false);
     $mform = new block_timestat_calendar();
-    $mform->set_data(array('datefrom' => $selecteddatefrom));
-    $mform->set_data(array('dateto' => $selecteddateto));
+    $mform->set_data(['datefrom' => $selecteddatefrom]);
+    $mform->set_data(['dateto' => $selecteddateto]);
     $mform->display();
 
     echo '</div>';
@@ -409,7 +409,7 @@ function block_timestat_report_log_print_selector_form($course, $selecteduser = 
     }
 
     // Get all the possible users.
-    $users = array();
+    $users = [];
 
     // Define limitfrom and limitnum for queries below.
     // If $showusers is enabled... don't apply limitfrom and limitnum.
@@ -446,7 +446,7 @@ function block_timestat_report_log_print_selector_form($course, $selecteduser = 
         asort($courses);
     }
 
-    $activities = array();
+    $activities = [];
     $selectedactivity = "";
 
     $modinfo = get_fast_modinfo($course);
@@ -488,13 +488,13 @@ function block_timestat_report_log_print_selector_form($course, $selecteduser = 
     asort($users);
 
     // Prepare the list of action options.
-    $actions = array(
+    $actions = [
             'view' => get_string('view'),
             'add' => get_string('add'),
             'update' => get_string('update'),
             'delete' => get_string('delete'),
-            '-view' => get_string('allchanges')
-    );
+            '-view' => get_string('allchanges'),
+    ];
 
     // Get all the possible dates.
     // Note that we are keeping track of real (GMT) time and user time.
@@ -506,7 +506,7 @@ function block_timestat_report_log_print_selector_form($course, $selecteduser = 
     $timemidnight = $today = usergetmidnight($timenow);
 
     // Put today up the top of the list.
-    $dates = array("$timemidnight" => get_string("today") . ", " . userdate($timenow, $strftimedate));
+    $dates = ["$timemidnight" => get_string("today") . ", " . userdate($timenow, $strftimedate)];
 
     if (!$course->startdate || ($course->startdate > $timenow)) {
         $course->startdate = $course->timecreated;
@@ -530,13 +530,13 @@ function block_timestat_report_log_print_selector_form($course, $selecteduser = 
     echo "<input type=\"hidden\" name=\"showusers\" value=\"$showusers\" />\n";
     echo "<input type=\"hidden\" name=\"showcourses\" value=\"$showcourses\" />\n";
     if (has_capability('report/log:view', $sitecontext) && $showcourses) {
-        echo html_writer::label(get_string('selectacourse'), 'menuid', false, array('class' => 'accesshide'));
+        echo html_writer::label(get_string('selectacourse'), 'menuid', false, ['class' => 'accesshide']);
         echo html_writer::select($courses, "id", $course->id, false);
     } else {
-        $courses = array();
+        $courses = [];
         $courses[$course->id] = get_course_display_name_for_list($course) . (($course->id == SITEID) ?
                         ' (' . get_string('site') . ') ' : '');
-        echo html_writer::label(get_string('selectacourse'), 'menuid', false, array('class' => 'accesshide'));
+        echo html_writer::label(get_string('selectacourse'), 'menuid', false, ['class' => 'accesshide']);
         echo html_writer::select($courses, "id", $course->id, false);
         if (has_capability('report/log:view', $sitecontext)) {
             $a = new stdClass();
@@ -552,24 +552,24 @@ function block_timestat_report_log_print_selector_form($course, $selecteduser = 
                 $groups[$cgroup->id] = $cgroup->name;
             }
         } else {
-            $groups = array();
+            $groups = [];
         }
-        echo html_writer::label(get_string('selectagroup'), 'menugroup', false, array('class' => 'accesshide'));
+        echo html_writer::label(get_string('selectagroup'), 'menugroup', false, ['class' => 'accesshide']);
         echo html_writer::select($groups, "group", $selectedgroup, get_string("allgroups"));
     }
 
     if ($showusers) {
-        echo html_writer::label(get_string('selctauser'), 'menuuser', false, array('class' => 'accesshide'));
+        echo html_writer::label(get_string('selctauser'), 'menuuser', false, ['class' => 'accesshide']);
         echo html_writer::select($users, "user", $selecteduser, get_string("allparticipants"));
     } else {
-        $users = array();
+        $users = [];
         if (!empty($selecteduser)) {
-            $user = $DB->get_record('user', array('id' => $selecteduser));
+            $user = $DB->get_record('user', ['id' => $selecteduser]);
             $users[$selecteduser] = fullname($user);
         } else {
             $users[0] = get_string('allparticipants');
         }
-        echo html_writer::label(get_string('selctauser'), 'menuuser', false, array('class' => 'accesshide'));
+        echo html_writer::label(get_string('selctauser'), 'menuuser', false, ['class' => 'accesshide']);
         echo html_writer::select($users, "user", $selecteduser, false);
         $a = new stdClass();
         $a->url = "$CFG->wwwroot/blocks/timestat/index.php?chooselog=0&group=$selectedgroup&user=$selecteduser"
@@ -577,17 +577,17 @@ function block_timestat_report_log_print_selector_form($course, $selecteduser = 
         print_string('logtoomanyusers', 'moodle', $a);
     }
 
-    echo html_writer::label(get_string('activities'), 'menumodid', false, array('class' => 'accesshide'));
+    echo html_writer::label(get_string('activities'), 'menumodid', false, ['class' => 'accesshide']);
     echo html_writer::select($activities, "modid", $selectedactivity, get_string("allactivities"));
-    echo html_writer::label(get_string('actions'), 'menumodaction', false, array('class' => 'accesshide'));
+    echo html_writer::label(get_string('actions'), 'menumodaction', false, ['class' => 'accesshide']);
 
-    $logformats = array('showashtml' => get_string('displayonpage'),
-            'downloadasexcel' => get_string('downloadexcel'));
+    $logformats = ['showashtml' => get_string('displayonpage'),
+            'downloadasexcel' => get_string('downloadexcel')];
 
-    echo html_writer::label(get_string('logsformat', 'report_log'), 'menulogformat', false, array('class' => 'accesshide'));
+    echo html_writer::label(get_string('logsformat', 'report_log'), 'menulogformat', false, ['class' => 'accesshide']);
     echo html_writer::select($logformats, 'logformat', $logformat, false);
     $mform = new block_timestat_calendar();
-    $mform->set_data(array('datefrom' => $course->startdate));
+    $mform->set_data(['datefrom' => $course->startdate]);
     $mform->display();
     echo '</div>';
     echo '</form>';
@@ -622,7 +622,7 @@ function block_timestat_print_log($course, $user = 0, $datefrom = 0, $dateto = 0
         exit;
     }
 
-    $courses = array();
+    $courses = [];
 
     if ($course->id == SITEID) {
         $courses[0] = '';
@@ -637,7 +637,7 @@ function block_timestat_print_log($course, $user = 0, $datefrom = 0, $dateto = 0
 
     $totalcount = $logs['totalcount'];
     $count = 0;
-    $ldcache = array();
+    $ldcache = [];
     $tt = getdate(time());
     $today = mktime(0, 0, 0, $tt["mon"], $tt["mday"], $tt["year"]);
 
@@ -650,14 +650,14 @@ function block_timestat_print_log($course, $user = 0, $datefrom = 0, $dateto = 0
     echo $OUTPUT->paging_bar($totalcount, $page, $perpage, "$url&perpage=$perpage");
 
     $table = new html_table();
-    $table->classes = array('logtable', 'generaltable');
-    $table->align = array('right', 'left', 'left');
-    $table->head = array(
+    $table->classes = ['logtable', 'generaltable'];
+    $table->align = ['right', 'left', 'left'];
+    $table->head = [
             get_string('fullnameuser'),
-            get_string('time')
+            get_string('time'),
 
-    );
-    $table->data = array();
+    ];
+    $table->data = [];
 
     if ($course->id == SITEID) {
         array_unshift($table->align, 'left');
@@ -666,12 +666,12 @@ function block_timestat_print_log($course, $user = 0, $datefrom = 0, $dateto = 0
 
     // Make sure that the logs array is an array, even it is empty, to avoid warnings from the foreach.
     if (empty($logs['logs'])) {
-        $logs['logs'] = array();
+        $logs['logs'] = [];
     }
 
     foreach ($logs['logs'] as $log) {
 
-        $row = array();
+        $row = [];
         if ($course->id == SITEID) {
             if (empty($log->course)) {
                 $row[] = get_string('site');
@@ -740,8 +740,8 @@ function block_timestat_build_logs_array($course, $user = 0, $datefrom = 0, $dat
             $groupid = 0;
         }
     }
-    $joins = array();
-    $params = array();
+    $joins = [];
+    $params = [];
 
     if ($course->id != SITEID || $modid != 0) {
         $joins[] = "l.courseid = :courseid";
@@ -794,7 +794,7 @@ function block_timestat_build_logs_array($course, $user = 0, $datefrom = 0, $dat
 
     $selector = implode(' AND ', $joins);
     $totalcount = 0;  // Initialise.
-    $result = array();
+    $result = [];
     $result['logs'] = block_timestat_get_logs($selector, $totalcount, $params, $limitfrom, $limitnum);
     $result['totalcount'] = $totalcount;
     return $result;
@@ -918,7 +918,7 @@ function block_timestat_print_log_xls($course, $user, $datefrom, $dateto, $modna
             $modname, $modid, $modaction, $groupid)) {
         return false;
     }
-    $courses = array();
+    $courses = [];
 
     if ($course->id == SITEID) {
         $courses[0] = '';
@@ -932,7 +932,7 @@ function block_timestat_print_log_xls($course, $user, $datefrom, $dateto, $modna
     }
 
     $count = 0;
-    $ldcache = array();
+    $ldcache = [];
     $tt = getdate(time());
     $today = mktime(0, 0, 0, $tt["mon"], $tt["mday"], $tt["year"]);
 
@@ -945,8 +945,8 @@ function block_timestat_print_log_xls($course, $user, $datefrom, $dateto, $modna
     $workbook = new MoodleExcelWorkbook('-');
     $workbook->send($filename);
 
-    $worksheet = array();
-    $headers = array(get_string('fullnameuser'), get_string('time'));
+    $worksheet = [];
+    $headers = [get_string('fullnameuser'), get_string('time')];
 
     // Creating worksheets.
     for ($wsnumber = 1; $wsnumber <= $nropages; $wsnumber++) {
@@ -1031,6 +1031,6 @@ function block_timestat_seconds_to_stringtime($seconds) {
 function block_timestat_get_user_last_log_by_contextid(int $contextid): stdClass {
     global $DB, $USER;
     $logs = $DB->get_records('logstore_standard_log',
-            array('contextid' => $contextid, 'userid' => $USER->id), 'timecreated DESC', '*', 0, 1);
+            ['contextid' => $contextid, 'userid' => $USER->id], 'timecreated DESC', '*', 0, 1);
     return reset($logs);
 }

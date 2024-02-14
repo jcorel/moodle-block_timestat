@@ -33,7 +33,7 @@ require_once($CFG->dirroot . '/blocks/timestat/locallib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class block_timestat extends block_base {
-    
+
     /**
      * Initialises the block.
      *
@@ -43,7 +43,7 @@ class block_timestat extends block_base {
     public function init() {
         $this->title = get_string('blocktitle', 'block_timestat');
     }
-    
+
     /**
      * Returns the contents.
      *
@@ -74,31 +74,31 @@ class block_timestat extends block_base {
         }
         return $this->content;
     }
-    
+
     /**
      * Defines where the block can be added.
      *
      * @return array
      */
     public function applicable_formats() {
-        return array(
+        return [
             'site-index' => false,
             'course-view' => true,
             'course-view-social' => true,
             'mod' => true,
             'mod-quiz' => true,
-            'course' => true
-        );
+            'course' => true,
+        ];
     }
-    
+
     public function has_config() {
         return true;
     }
-    
+
     public function instance_allow_multiple() {
         return false;
     }
-    
+
     public function get_config_for_external() {
         $configs = get_config('block_timestat');
         return (object)[

@@ -81,7 +81,7 @@ $showusers = optional_param('showusers', 0, PARAM_INT);
 $chooselog = optional_param('chooselog', 0, PARAM_INT);
 $logformat = optional_param('logformat', 'showashtml', PARAM_ALPHA);
 
-$params = array();
+$params = [];
 if ($id !== 0) {
     $params['id'] = $id;
 }
@@ -133,10 +133,10 @@ $PAGE->set_url('/block/timestat/index.php', $params);
 $PAGE->set_pagelayout('report');
 
 if ($hostid == $CFG->mnet_localhost_id) {
-    $course = $DB->get_record('course', array('id' => $id), '*', MUST_EXIST);
+    $course = $DB->get_record('course', ['id' => $id], '*', MUST_EXIST);
 
 } else {
-    $coursestub = $DB->get_record('mnet_log', array('hostid' => $hostid, 'course' => $id), '*', true);
+    $coursestub = $DB->get_record('mnet_log', ['hostid' => $hostid, 'course' => $id], '*', true);
     $course->id = $id;
     $course->shortname = $coursestub->coursename;
     $course->fullname = $coursestub->coursename;
@@ -168,7 +168,7 @@ if (!empty($chooselog)) {
     $dateinfo = get_string('alldays');
 
     if ($user) {
-        $u = $DB->get_record('user', array('id' => $user, 'deleted' => 0), '*', MUST_EXIST);
+        $u = $DB->get_record('user', ['id' => $user, 'deleted' => 0], '*', MUST_EXIST);
         $userinfo = fullname($u, has_capability('moodle/site:viewfullnames', $context));
     }
     if ($datefrom) {
@@ -221,7 +221,7 @@ if (!empty($chooselog)) {
 
 } else {
     if ($hostid != $CFG->mnet_localhost_id || $course->id == SITEID) {
-        admin_externalpage_setup('reportlog', '', null, '', array('pagelayout' => 'report'));
+        admin_externalpage_setup('reportlog', '', null, '', ['pagelayout' => 'report']);
         echo $OUTPUT->header();
     } else {
         $PAGE->set_title($course->shortname . ': ' . $strlogs);

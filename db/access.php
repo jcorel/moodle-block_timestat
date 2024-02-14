@@ -24,53 +24,53 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-$capabilities = array(
-    'block/timestat:view' => array(
+$capabilities = [
+    'block/timestat:view' => [
         'captype' => 'read',
         'contextlevel' => CONTEXT_BLOCK,
-        'archetypes' => array(
+        'archetypes' => [
             'guest' => CAP_PREVENT,
             'user' => CAP_PREVENT,
             'student' => CAP_ALLOW,
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
             'coursecreator' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
-        )
-    ),
-    'block/timestat:viewreport' => array(
+            'manager' => CAP_ALLOW,
+        ],
+    ],
+    'block/timestat:viewreport' => [
         'captype' => 'read',
         'contextlevel' => CONTEXT_BLOCK,
-        'archetypes' => array(
+        'archetypes' => [
             'guest' => CAP_PREVENT,
             'user' => CAP_PREVENT,
             'student' => CAP_PREVENT,
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
             'coursecreator' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
-        )
-    ),
-    'block/timestat:viewtimer' => array(
+            'manager' => CAP_ALLOW,
+        ],
+    ],
+    'block/timestat:viewtimer' => [
         'captype' => 'read',
         'contextlevel' => CONTEXT_BLOCK,
-        'archetypes' => array(
+        'archetypes' => [
             'guest' => CAP_PREVENT,
             'user' => CAP_PREVENT,
             'student' => CAP_PREVENT,
             'teacher' => CAP_PREVENT,
             'editingteacher' => CAP_PREVENT,
             'coursecreator' => CAP_PREVENT,
-            'manager' => CAP_ALLOW
-        )
-    ),
-    'block/timestat:addinstance' => array(
+            'manager' => CAP_ALLOW,
+        ],
+    ],
+    'block/timestat:addinstance' => [
         'riskbitmask' => RISK_SPAM | RISK_XSS,
         'captype' => 'write',
         'contextlevel' => CONTEXT_BLOCK,
-        'archetypes' => array(
+        'archetypes' => [
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
-        ),
-    ),
-);
+            'manager' => CAP_ALLOW,
+        ],
+    ],
+];
