@@ -650,7 +650,7 @@ function block_timestat_print_log($course, $user = 0, $datefrom = 0, $dateto = 0
     echo $OUTPUT->paging_bar($totalcount, $page, $perpage, "$url&perpage=$perpage");
 
     $table = new html_table();
-    $table->classes = ['logtable', 'generaltable'];
+    $table->attributes['class'] = 'generaltable';
     $table->align = ['right', 'left', 'left'];
     $table->head = [
             get_string('fullnameuser'),
